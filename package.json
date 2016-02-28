@@ -1,0 +1,60 @@
+{
+    "name": "vscode-svgviewer",
+    "displayName": "SVG Viewer",
+    "description": "SVG Viewer",
+    "version": "1.0.0",
+    "publisher": "cssho",
+    "engines": {
+        "vscode": "^0.10.8"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:svgviewer.open",
+        "onCommand:svgviewer.saveas"
+    ],
+    "main": "./out/src/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "svgviewer.open",
+                "title": "SVG Viewer: View SVG"
+            },
+            {
+                "command": "svgviewer.saveas",
+                "title": "SVG Viewer: Export PNG"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "svgviewer.open",
+                "key": "ctrl+i o",
+                "mac": "cmd+i o"
+            },
+            {
+                "command": "svgviewer.saveas",
+                "key": "ctrl+i e",
+                "mac": "cmd+i e"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+        "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "devDependencies": {
+        "pn": "^1.0.0",
+        "svg2png": "^3.0.0",
+        "tmp": "0.0.28",
+        "typescript": "^1.7.5",
+        "vscode": "^0.11.1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cssho/vscode-svgviewer.git"
+    },
+    "license": "MIT",
+    "icon": "icon.png"
+}
