@@ -1,20 +1,19 @@
-[Japanese Readme](README-ja.md)
 # vscode-svgviewer
 SVG Viewer for Visual Studio Code
 [Visual Studio Marketplace](https://marketplace.visualstudio.com/items/cssho.vscode-svgviewer)
 
 ## Usage 
-0. Press Ctrl+P and type `ext install SVG Viewer` with a trailing space. 
-0. Press Enter and restart VSCode.
-0. Open a SVG File.
-0. Choose process from `Command Palette` or `Shortcut`.
+0. コマンドパレットを表示し、入力欄に`ext install SVG Viewer`と入力
+0. Enterを押下し、VSCodeを再起動
+0. SVGファイルを開く
+0. コマンドパレットかショートカットから処理を選択
 
 ![palette](img/palette.png)
 
 ### View SVG - `Ctrl(Cmd)+I O`
-Display SVG on an Editor
+SVGをエディタ上で表示
 
 ### Export PNG - `Ctrl(Cmd)+I E`
-Convert from SVG to PNG
+SVGをPNGに変換
 
 ![preview](img/preview.png)
