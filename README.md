@@ -18,3 +18,13 @@ Display SVG on an Editor
 Convert from SVG to PNG
 
 ![preview](img/preview.png)
+
+### Options
+The following Visual Studio Code setting is available for the SVG Viewer.  This can be set in `User Settings` or `Workspace Settings`.
+
+```javascript
+{
+    // Show Transparency Grid
+	"svgviewer.transparencygrid": true
+}
+```

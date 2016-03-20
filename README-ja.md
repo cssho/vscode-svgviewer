@@ -17,3 +17,13 @@ SVGをエディタ上で表示
 SVGをPNGに変換
 
 ![preview](img/preview.png)
+
+### Options
+SVG Viewerでは以下のVisual Studio Codeの設定が可能です。`User Settings`または`Workspace Settings`で設定できます。
+
+```javascript
+{
+    // 透明グリッドを表示
+	"svgviewer.transparencygrid": true
+}
+```
