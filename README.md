@@ -17,6 +17,9 @@ Display SVG on an Editor
 ### Export PNG - `Ctrl(Cmd)+I E`
 Convert from SVG to PNG
 
+### Copy data URI scheme - `Ctrl(Cmd)+I C`
+Convert from SVG to data URI scheme and copy to the clipboard
+
 ![preview](img/preview.png)
 
 ### Options
