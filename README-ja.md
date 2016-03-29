@@ -16,6 +16,9 @@ SVGをエディタ上で表示
 ### Export PNG - `Ctrl(Cmd)+I E`
 SVGをPNGに変換
 
+### Copy data URI scheme - `Ctrl(Cmd)+I C`
+SVGをdata URI schemeに変換し、クリップボードにコピー
+
 ![preview](img/preview.png)
 
 ### Options
