@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 const fs = require('pn/fs');
 const svg2png = require('svg2png');
 const tmp = require('tmp');
-
+const cp = require('copy-paste');
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -49,8 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
         private snippet(properties): string {
             let showTransGrid = vscode.workspace.getConfiguration('svgviewer').get('transparencygrid');
             let transparencyGridCss = '';
-            if(showTransGrid)
-            {
+            if (showTransGrid) {
                 transparencyGridCss = `
 <style type="text/css">
 .svgbg svg {
@@ -104,6 +103,15 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     context.subscriptions.push(saveas);
+
+    let copydu = vscode.commands.registerTextEditorCommand('svgviewer.copydui', (te, t) => {
+        if (checkNoSvg(te)) return;
+        let editor = vscode.window.activeTextEditor;
+        let text = editor.document.getText();
+        cp.copy('data:image/svg+xml,' + encodeURIComponent(text));
+    });
+
+    context.subscriptions.push(copydu);
 }
 function checkNoSvg(editor: vscode.TextEditor) {
 
