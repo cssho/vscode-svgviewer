@@ -67,16 +67,10 @@ export function activate(context: vscode.ExtensionContext) {
     let registration = vscode.workspace.registerTextDocumentContentProvider('svg-preview', provider);
 
     vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
-        if (e.document === vscode.window.activeTextEditor.document) {
+        if (e.document === vscode.window.activeTextEditor.document && !checkNoSvg(vscode.window.activeTextEditor, false)) {
             provider.update(previewUri);
         }
     });
-
-    vscode.window.onDidChangeTextEditorSelection((e: vscode.TextEditorSelectionChangeEvent) => {
-        if (e.textEditor === vscode.window.activeTextEditor) {
-            provider.update(previewUri);
-        }
-    })
 
     let open = vscode.commands.registerTextEditorCommand('svgviewer.open', (te, t) => {
         if (checkNoSvg(te)) return;
@@ -113,10 +107,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(copydu);
 }
-function checkNoSvg(editor: vscode.TextEditor) {
+function checkNoSvg(editor: vscode.TextEditor, displayMessage: boolean = true) {
 
     let isNGType = !(editor.document.languageId === 'xml') || editor.document.getText().indexOf('</svg>') < 0;
-    if (isNGType) {
+    if (isNGType && displayMessage) {
         vscode.window.showWarningMessage("Active editor doesn't show a SVG document - no properties to preview.");
     }
     return isNGType;
