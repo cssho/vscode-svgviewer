@@ -29,7 +29,6 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         private createSvgSnippet() {
-
             return this.extractSnippet();
         }
 
@@ -74,6 +73,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     let open = vscode.commands.registerTextEditorCommand('svgviewer.open', (te, t) => {
         if (checkNoSvg(te)) return;
+        provider.update(previewUri);
         return vscode.commands.executeCommand('vscode.previewHtml', previewUri, vscode.ViewColumn.Two)
             .then(s => console.log('done.'), vscode.window.showErrorMessage);
 
