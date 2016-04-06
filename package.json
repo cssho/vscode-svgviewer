@@ -2,7 +2,7 @@
   "name": "vscode-svgviewer",
   "displayName": "SVG Viewer",
   "description": "SVG Viewer",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "publisher": "cssho",
   "engines": {
     "vscode": "^0.10.8"
@@ -13,6 +13,7 @@
   "activationEvents": [
     "onCommand:svgviewer.open",
     "onCommand:svgviewer.saveas",
+    "onCommand:svgviewer.saveassize",
     "onCommand:svgviewer.copydui"
   ],
   "main": "./out/src/extension",
@@ -25,6 +26,10 @@
       {
         "command": "svgviewer.saveas",
         "title": "SVG Viewer: Export PNG"
+      },
+      {
+        "command": "svgviewer.saveassize",
+        "title": "SVG Viewer: Export PNG explicitly set the size"
       },
       {
         "command": "svgviewer.copydui",
@@ -41,6 +46,11 @@
         "command": "svgviewer.saveas",
         "key": "ctrl+i e",
         "mac": "cmd+i e"
+      },
+      {
+        "command": "svgviewer.saveassize",
+        "key": "ctrl+i x",
+        "mac": "cmd+i x"
       },
       {
         "command": "svgviewer.copydui",
