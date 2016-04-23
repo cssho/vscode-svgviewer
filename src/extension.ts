@@ -87,16 +87,31 @@ export function activate(context: vscode.ExtensionContext) {
         let text = editor.document.getText();
         let tmpobj = tmp.fileSync();
         let pngpath = editor.document.uri.fsPath.replace('.svg', '.png');
-        fs.writeFile(tmpobj.name, text, 'utf-8')
-            .then(fs.readFile(tmpobj.name)
-                .then(svg2png)
-                .then(buffer => fs.writeFile(pngpath, buffer))
-                .catch(e => console.error(e))
-                .then(tmpobj.removeCallback())
-                .then(vscode.window.showInformationMessage('export done. ' + pngpath)));
+        exportPng(tmpobj, text, pngpath);
     });
 
     context.subscriptions.push(saveas);
+
+    let saveassize = vscode.commands.registerTextEditorCommand('svgviewer.saveassize', (te, t) => {
+        if (checkNoSvg(te)) return;
+        let editor = vscode.window.activeTextEditor;
+        let text = editor.document.getText();
+        let tmpobj = tmp.fileSync();
+        let pngpath = editor.document.uri.fsPath.replace('.svg', '.png');
+        creatInputBox('width')
+            .then(width => {
+                if (width) {
+                    creatInputBox('height')
+                        .then(height => {
+                            if (height) {
+                                exportPng(tmpobj, text, pngpath, Number(width), Number(height));
+                            }
+                        });
+                }
+            });
+    });
+
+    context.subscriptions.push(saveassize);
 
     let copydu = vscode.commands.registerTextEditorCommand('svgviewer.copydui', (te, t) => {
         if (checkNoSvg(te)) return;
@@ -107,6 +122,13 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(copydu);
 }
+function creatInputBox(param: string): Thenable<string> {
+    return vscode.window.showInputBox({
+        prompt: `Set ${param} of the png.`,
+        placeHolder: `${param}`,
+        validateInput: checkSizeInput
+    });
+}
 function checkNoSvg(editor: vscode.TextEditor, displayMessage: boolean = true) {
 
     let isNGType = !(editor.document.languageId === 'xml') || editor.document.getText().indexOf('</svg>') < 0;
@@ -114,6 +136,23 @@ function checkNoSvg(editor: vscode.TextEditor, displayMessage: boolean = true) {
         vscode.window.showWarningMessage("Active editor doesn't show a SVG document - no properties to preview.");
     }
     return isNGType;
+}
+
+function checkSizeInput(value: string): string {
+    return value !== '' && !isNaN(Number(value)) && Number(value) > 0
+        ? null : 'Please set number.';
+}
+
+function exportPng(tmpobj: any, text: string, pngpath: string, w?: number, h?: number) {
+    console.log(`export width:${w} height:${h}`);
+    let result = fs.writeFile(tmpobj.name, text, 'utf-8')
+        .then(fs.readFile(tmpobj.name)
+            .then(source => (w === undefined || h === undefined) ? svg2png(source) : svg2png(source, { width: w, height: h }))
+            .then(buffer => {
+                fs.writeFile(pngpath, buffer);
+                vscode.window.showInformationMessage('export done. ' + pngpath);
+            })
+            .catch(e => vscode.window.showErrorMessage(e.message)));
 }
 
 export function deactivate() {

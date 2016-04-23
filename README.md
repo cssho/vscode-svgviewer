@@ -3,8 +3,8 @@
 SVG Viewer for Visual Studio Code
 [Visual Studio Marketplace](https://marketplace.visualstudio.com/items/cssho.vscode-svgviewer)
 
-![](http://vsmarketplacebadge.apphb.com/version/cssho.vscode-svgviewer.svg)
-![](http://vsmarketplacebadge.apphb.com/installs/cssho.vscode-svgviewer.svg)
+[![](http://vsmarketplacebadge.apphb.com/version/cssho.vscode-svgviewer.svg)](https://marketplace.visualstudio.com/items?itemName=cssho.vscode-svgviewer)
+[![](http://vsmarketplacebadge.apphb.com/installs/cssho.vscode-svgviewer.svg)](https://marketplace.visualstudio.com/items?itemName=cssho.vscode-svgviewer)
 
 ## Usage 
 0. Press Ctrl+P and type `ext install SVG Viewer` with a trailing space. 
@@ -19,6 +19,9 @@ Display SVG on an Editor
 
 ### Export PNG - `Ctrl(Cmd)+I E`
 Convert from SVG to PNG
+
+### Export PNG with explicitly size - `Ctrl(Cmd)+I X`
+Convert from SVG to PNG with explicitly size
 
 ### Copy data URI scheme - `Ctrl(Cmd)+I C`
 Convert from SVG to data URI scheme and copy to the clipboard
