@@ -14,16 +14,16 @@ SVG Viewer for Visual Studio Code
 
 ![palette](img/palette.png)
 
-### View SVG - `Ctrl(Cmd)+I O`
+### View SVG - `Ctrl(Cmd)+Shift+V O`
 Display SVG on an Editor
 
-### Export PNG - `Ctrl(Cmd)+I E`
+### Export PNG - `Ctrl(Cmd)+Shift+V E`
 Convert from SVG to PNG
 
-### Export PNG with explicitly size - `Ctrl(Cmd)+I X`
+### Export PNG with explicitly size - `Ctrl(Cmd)+Shift+V X`
 Convert from SVG to PNG with explicitly size
 
-### Copy data URI scheme - `Ctrl(Cmd)+I C`
+### Copy data URI scheme - `Ctrl(Cmd)+Shift+V C`
 Convert from SVG to data URI scheme and copy to the clipboard
 
 ![preview](img/preview.png)
