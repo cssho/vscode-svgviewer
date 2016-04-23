@@ -20,8 +20,8 @@ Display SVG on an Editor
 ### Export PNG - `Ctrl(Cmd)+I E`
 Convert from SVG to PNG
 
-### Export PNG explicitly set the size - `Ctrl(Cmd)+I X`
-Convert from SVG to PNG explicitly set the size
+### Export PNG with explicitly size - `Ctrl(Cmd)+I X`
+Convert from SVG to PNG with explicitly size
 
 ### Copy data URI scheme - `Ctrl(Cmd)+I C`
 Convert from SVG to data URI scheme and copy to the clipboard

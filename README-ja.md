@@ -19,7 +19,7 @@ SVGをエディタ上で表示
 ### Export PNG - `Ctrl(Cmd)+I E`
 SVGをPNGに変換
 
-### Export PNG explicitly set the size - `Ctrl(Cmd)+I X`
+###　Export PNG with explicitly size - `Ctrl(Cmd)+I X`
 サイズを明示的に指定して、SVGをPNGに変換
 
 ### Copy data URI scheme - `Ctrl(Cmd)+I C`
