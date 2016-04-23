@@ -2,7 +2,7 @@
   "name": "vscode-svgviewer",
   "displayName": "SVG Viewer",
   "description": "SVG Viewer",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "publisher": "cssho",
   "engines": {
     "vscode": "^0.10.8"
@@ -39,23 +39,23 @@
     "keybindings": [
       {
         "command": "svgviewer.open",
-        "key": "ctrl+i o",
-        "mac": "cmd+i o"
+        "key": "ctrl+shift+v o",
+        "mac": "cmd+shift+v o"
       },
       {
         "command": "svgviewer.saveas",
-        "key": "ctrl+i e",
-        "mac": "cmd+i e"
+        "key": "ctrl+shift+v e",
+        "mac": "cmd+shift+v e"
       },
       {
         "command": "svgviewer.saveassize",
-        "key": "ctrl+i x",
-        "mac": "cmd+i x"
+        "key": "ctrl+shift+v x",
+        "mac": "cmd+shift+v x"
       },
       {
         "command": "svgviewer.copydui",
-        "key": "ctrl+i c",
-        "mac": "cmd+i c"
+        "key": "ctrl+shift+v c",
+        "mac": "cmd+shift+v c"
       }
     ],
     "configuration": {
