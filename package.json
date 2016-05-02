@@ -1,8 +1,8 @@
 {
   "name": "vscode-svgviewer",
   "displayName": "SVG Viewer",
-  "description": "SVG Viewer",
-  "version": "1.1.7",
+  "description": "SVG Viewer for Visual Studio Code.",
+  "version": "1.1.10",
   "publisher": "cssho",
   "engines": {
     "vscode": "^0.10.8"
@@ -90,5 +90,18 @@
     "url": "https://github.com/cssho/vscode-svgviewer.git"
   },
   "license": "MIT",
-  "icon": "icon.png"
+  "icon": "icon.png",
+  "galleryBanner": {
+    "color": "#93E4D5",
+    "theme": "light"
+  },
+  "bugs": {
+    "url": "https://github.com/cssho/vscode-svgviewer/issues"
+  },
+  "homepage": "https://github.com/cssho/vscode-svgviewer/blob/master/README.md",
+  "keywords": [
+    "svg",
+    "viewer",
+    "image"
+  ]
 }
