@@ -2,7 +2,7 @@
   "name": "vscode-svgviewer",
   "displayName": "SVG Viewer",
   "description": "SVG Viewer for Visual Studio Code.",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "publisher": "cssho",
   "engines": {
     "vscode": "^0.10.8"
@@ -39,23 +39,19 @@
     "keybindings": [
       {
         "command": "svgviewer.open",
-        "key": "ctrl+shift+v o",
-        "mac": "cmd+shift+v o"
+        "key": "alt+s o"
       },
       {
         "command": "svgviewer.saveas",
-        "key": "ctrl+shift+v e",
-        "mac": "cmd+shift+v e"
+        "key": "alt+s e"
       },
       {
         "command": "svgviewer.saveassize",
-        "key": "ctrl+shift+v x",
-        "mac": "cmd+shift+v x"
+        "key": "alt+s x"
       },
       {
         "command": "svgviewer.copydui",
-        "key": "ctrl+shift+v c",
-        "mac": "cmd+shift+v c"
+        "key": "alt+s c"
       }
     ],
     "configuration": {
