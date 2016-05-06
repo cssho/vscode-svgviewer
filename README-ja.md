@@ -14,16 +14,16 @@ SVG Viewer for Visual Studio Code
 
 ![palette](img/palette.png)
 
-### View SVG - `Ctrl(Cmd)+Shift+V O`
+### View SVG - `Alt+S O`
 SVGをエディタ上で表示
 
-### Export PNG - `Ctrl(Cmd)+Shift+V E`
+### Export PNG - `Alt+S E`
 SVGをPNGに変換
 
-### Export PNG with explicitly size - `Ctrl(Cmd)+Shift+V X`
+### Export PNG with explicitly size - `Alt+S X`
 サイズを明示的に指定して、SVGをPNGに変換
 
-### Copy data URI scheme - `Ctrl(Cmd)+Shift+V C`
+### Copy data URI scheme - `Alt+S C`
 SVGをdata URI schemeに変換し、クリップボードにコピー
 
 ![preview](img/preview.png)
