@@ -1,66 +1,30 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import { SvgDocumentContentProvider } from './svgProvider';
 
+const exec = require('sync-exec');
 const fs = require('pn/fs');
-const svg2png = require('svg2png');
 const tmp = require('tmp');
 const cp = require('copy-paste');
-
+const svgexport = require('svgexport');
+const path = require('path');
+const phantomjs = require('phantomjs-prebuilt');
 export function activate(context: vscode.ExtensionContext) {
 
     console.log('SVG Viewer is now active!');
+    
+    // Check PhantomJS Binary   
+    if (!fs.existsSync(phantomjs.path)) {
+        exec('npm rebuild', { cwd: context.extensionPath });
+        process.env.PHANTOMJS_PLATFORM = process.platform;
+        process.env.PHANTOMJS_ARCH = process.arch;
+        phantomjs.path = process.platform === 'win32' ?
+            path.join(path.dirname(phantomjs.path), 'phantomjs.exe') :
+            path.join(path.dirname(phantomjs.path), 'phantom', 'bin', 'phantomjs');
+    }
 
     let previewUri = vscode.Uri.parse('svg-preview://authority/svg-preview');
-
-    class SvgDocumentContentProvider implements vscode.TextDocumentContentProvider {
-        private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
-
-        public provideTextDocumentContent(uri: vscode.Uri): string {
-            return this.createSvgSnippet();
-        }
-
-        get onDidChange(): vscode.Event<vscode.Uri> {
-            return this._onDidChange.event;
-        }
-
-        public update(uri: vscode.Uri) {
-            this._onDidChange.fire(uri);
-        }
-
-        private createSvgSnippet() {
-            return this.extractSnippet();
-        }
-
-        private extractSnippet(): string {
-            let editor = vscode.window.activeTextEditor;
-            let text = editor.document.getText();
-            return this.snippet(text);
-        }
-
-        private errorSnippet(error: string): string {
-            return `
-                <body>
-                    ${error}
-                </body>`;
-        }
-
-        private snippet(properties): string {
-            let showTransGrid = vscode.workspace.getConfiguration('svgviewer').get('transparencygrid');
-            let transparencyGridCss = '';
-            if (showTransGrid) {
-                transparencyGridCss = `
-<style type="text/css">
-.svgbg svg {
-  background:initial;
-  background-image: url(data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAeUlEQVRYR+3XMQ4AIQhEUTiU9+/hUGy9Wk2G8luDIS8EMWdmYvF09+JtEUmBpieCJiA96AIiiKAswEsik10JCCIoCrAsiGBPOIK2YFWt/knOOW5Nv/ykQNMTQRMwEERQFWAOqmJ3PIIIigIMahHs3ahZt0xCetAEjA99oc8dGNmnIAAAAABJRU5ErkJggg==);
-  background-position: left,top;
-}
-</style>`;
-            }
-            return `<!DOCTYPE html><html><head>${transparencyGridCss}</head><body><div class="svgbg">${properties}</div></body></html>`;
-        }
-    }
 
     let provider = new SvgDocumentContentProvider();
     let registration = vscode.workspace.registerTextDocumentContentProvider('svg-preview', provider);
@@ -85,7 +49,7 @@ export function activate(context: vscode.ExtensionContext) {
         if (checkNoSvg(te)) return;
         let editor = vscode.window.activeTextEditor;
         let text = editor.document.getText();
-        let tmpobj = tmp.fileSync();
+        let tmpobj = tmp.fileSync({ 'postfix': '.svg' });
         let pngpath = editor.document.uri.fsPath.replace('.svg', '.png');
         exportPng(tmpobj, text, pngpath);
     });
@@ -96,7 +60,7 @@ export function activate(context: vscode.ExtensionContext) {
         if (checkNoSvg(te)) return;
         let editor = vscode.window.activeTextEditor;
         let text = editor.document.getText();
-        let tmpobj = tmp.fileSync();
+        let tmpobj = tmp.fileSync({ 'postfix': '.svg' });
         let pngpath = editor.document.uri.fsPath.replace('.svg', '.png');
         creatInputBox('width')
             .then(width => {
@@ -146,13 +110,18 @@ function checkSizeInput(value: string): string {
 function exportPng(tmpobj: any, text: string, pngpath: string, w?: number, h?: number) {
     console.log(`export width:${w} height:${h}`);
     let result = fs.writeFile(tmpobj.name, text, 'utf-8')
-        .then(fs.readFile(tmpobj.name)
-            .then(source => (w === undefined || h === undefined) ? svg2png(source) : svg2png(source, { width: w, height: h }))
-            .then(buffer => {
-                fs.writeFile(pngpath, buffer);
-                vscode.window.showInformationMessage('export done. ' + pngpath);
-            })
-            .catch(e => vscode.window.showErrorMessage(e.message)));
+        .then(x => {
+            svgexport.render(
+                {
+                    'input': tmpobj.name,
+                    'output': `${pngpath} pad ${w || ''}${w == null && h == null ? '' : ':'}${h || ''}`
+                },
+                function (err) {
+                    if (!err) vscode.window.showInformationMessage('export done. ' + pngpath);
+                    else vscode.window.showErrorMessage(err);
+                });
+        })
+        .catch(e => vscode.window.showErrorMessage(e.message));
 }
 
 export function deactivate() {

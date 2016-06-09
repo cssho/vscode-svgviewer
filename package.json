@@ -2,7 +2,7 @@
   "name": "vscode-svgviewer",
   "displayName": "SVG Viewer",
   "description": "SVG Viewer for Visual Studio Code.",
-  "version": "1.1.11",
+  "version": "1.1.12",
   "publisher": "cssho",
   "engines": {
     "vscode": "^0.10.8"
@@ -11,10 +11,7 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:svgviewer.open",
-    "onCommand:svgviewer.saveas",
-    "onCommand:svgviewer.saveassize",
-    "onCommand:svgviewer.copydui"
+    "*"
   ],
   "main": "./out/src/extension",
   "contributes": {
@@ -77,8 +74,10 @@
   },
   "dependencies": {
     "copy-paste": "^1.1.4",
+    "node-cmd": "^1.1.1",
+    "path": "^0.12.7",
     "pn": "^1.0.0",
-    "svg2png": "^3.0.0",
+    "svgexport": "^0.3.2",
     "tmp": "0.0.28"
   },
   "repository": {
