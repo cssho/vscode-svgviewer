@@ -2,6 +2,7 @@
 
 import * as vscode from 'vscode';
 import { SvgDocumentContentProvider } from './svgProvider';
+import { ExportDocumentContentProvider } from './exportProvider';
 
 const exec = require('sync-exec');
 const fs = require('pn/fs');
@@ -85,6 +86,47 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     context.subscriptions.push(copydu);
+
+    let exportProvider = new ExportDocumentContentProvider(context);
+    vscode.workspace.registerTextDocumentContentProvider('svg-export', exportProvider)
+    
+    let makeExportUri = (uri) => uri.with({
+            scheme: 'svg-export',
+            path: uri.path + '.rendered',
+            query: uri.toString()
+    });
+
+    vscode.workspace.onDidChangeTextDocument((event: vscode.TextDocumentChangeEvent) => {
+        if (event.document === vscode.window.activeTextEditor.document) {
+            exportProvider.update(makeExportUri(event.document.uri));
+        }
+    });
+
+    let openexport = vscode.commands.registerCommand('svgviewer.openexport', async function(uri) {
+        if (!(uri instanceof vscode.Uri)) {
+            if (vscode.window.activeTextEditor) {
+                uri = vscode.window.activeTextEditor.document.uri;
+            } else {
+                return;
+            }
+        }
+        let document = await vscode.workspace.openTextDocument(uri);
+        if (!(document.languageId === 'xml') || document.getText().indexOf('</svg>') < 0) {
+            return;
+        }
+        
+        return vscode.commands.executeCommand('vscode.previewHtml', makeExportUri(uri));
+    });
+
+    context.subscriptions.push(openexport);
+
+    let savedu = vscode.commands.registerCommand('svgviewer.savedu', async function(args) {
+        let data = new Buffer(args.du.split(',')[1], 'base64');
+        fs.writeFileSync(args.output, data);
+        vscode.window.showInformationMessage('export done. ' + args.output);
+    });
+
+    context.subscriptions.push(savedu);
 }
 function creatInputBox(param: string): Thenable<string> {
     return vscode.window.showInputBox({
