@@ -27,7 +27,6 @@ export class ExportDocumentContentProvider implements vscode.TextDocumentContent
 
     private snippet(document: vscode.TextDocument): string {
         let showTransGrid = vscode.workspace.getConfiguration('svgviewer').get('transparencygrid');
-        let transGridCss = '';
         let css = `<link rel="stylesheet" type="text/css" href="${this.getPath('media/export.css')}">`;
         let jquery = `<script src="${this.getPath('node_modules/jquery/dist/jquery.js')}"></script>`;
         let exportjs = `<script src="${this.getPath('media/export.js')}"></script>`;
