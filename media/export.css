@@ -1,0 +1,65 @@
+.svgbg[data-showtransgrid="true"] {
+    background:initial;
+    background-image: url(data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAeUlEQVRYR+3XMQ4AIQhEUTiU9+/hUGy9Wk2G8luDIS8EMWdmYvF09+JtEUmBpieCJiA96AIiiKAswEsik10JCCIoCrAsiGBPOIK2YFWt/knOOW5Nv/ykQNMTQRMwEERQFWAOqmJ3PIIIigIMahHs3ahZt0xCetAEjA99oc8dGNmnIAAAAABJRU5ErkJggg==);
+    background-position: left,top;
+}
+
+svg, #image {
+    display: none;
+}
+
+.form {
+    background-color: #2D2D30;
+    padding: 5px;
+    display: inline-block;
+}
+
+.label-name {
+    display: inline-block;
+    text-align: right;
+    width: 40px;
+}
+
+.wrapper {
+    display: inline-block;
+    background-color: #3c3c3c;
+    border: 1px solid transparent;
+    padding: 5px;
+}
+
+.active {
+    border: 1px solid rgba(14,99,156,.6);
+}
+
+input {
+    text-align: right;
+    background-color: transparent;
+    border-style: none;
+    color: inherit;
+    width: 60px;
+}
+
+input:focus {
+    outline: 0;
+}
+
+.button {
+    display: inline-block;
+    border: 1px;
+    padding: 5px;
+    background-color: #0e639c;
+    border: 1px solid #0e639c;
+    text-decoration: none;
+    color: inherit;
+    outline: 0;
+}
+
+.button:focus {
+    outline: 0;
+}
+
+.button[href="#"] {
+    background-color: gray;
+    border: 1px solid gray;
+    cursor: not-allowed;
+}

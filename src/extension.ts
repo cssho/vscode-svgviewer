@@ -2,6 +2,7 @@
 
 import * as vscode from 'vscode';
 import { SvgDocumentContentProvider } from './svgProvider';
+import { ExportDocumentContentProvider } from './exportProvider';
 
 const exec = require('sync-exec');
 const fs = require('pn/fs');
@@ -30,13 +31,13 @@ export function activate(context: vscode.ExtensionContext) {
     let registration = vscode.workspace.registerTextDocumentContentProvider('svg-preview', provider);
 
     vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
-        if (e.document === vscode.window.activeTextEditor.document && !checkNoSvg(vscode.window.activeTextEditor, false)) {
+        if (e.document === vscode.window.activeTextEditor.document && !checkNoSvg(vscode.window.activeTextEditor.document, false)) {
             provider.update(previewUri);
         }
     });
 
     let open = vscode.commands.registerTextEditorCommand('svgviewer.open', (te, t) => {
-        if (checkNoSvg(te)) return;
+        if (checkNoSvg(te.document)) return;
         provider.update(previewUri);
         return vscode.commands.executeCommand('vscode.previewHtml', previewUri, vscode.ViewColumn.Two)
             .then(s => console.log('done.'), vscode.window.showErrorMessage);
@@ -46,7 +47,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(open);
 
     let saveas = vscode.commands.registerTextEditorCommand('svgviewer.saveas', (te, t) => {
-        if (checkNoSvg(te)) return;
+        if (checkNoSvg(te.document)) return;
         let editor = vscode.window.activeTextEditor;
         let text = editor.document.getText();
         let tmpobj = tmp.fileSync({ 'postfix': '.svg' });
@@ -57,7 +58,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(saveas);
 
     let saveassize = vscode.commands.registerTextEditorCommand('svgviewer.saveassize', (te, t) => {
-        if (checkNoSvg(te)) return;
+        if (checkNoSvg(te.document)) return;
         let editor = vscode.window.activeTextEditor;
         let text = editor.document.getText();
         let tmpobj = tmp.fileSync({ 'postfix': '.svg' });
@@ -78,13 +79,55 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(saveassize);
 
     let copydu = vscode.commands.registerTextEditorCommand('svgviewer.copydui', (te, t) => {
-        if (checkNoSvg(te)) return;
+        if (checkNoSvg(te.document)) return;
         let editor = vscode.window.activeTextEditor;
         let text = editor.document.getText();
         cp.copy('data:image/svg+xml,' + encodeURIComponent(text));
     });
 
     context.subscriptions.push(copydu);
+
+    let exportProvider = new ExportDocumentContentProvider(context);
+    vscode.workspace.registerTextDocumentContentProvider('svg-export', exportProvider)
+    
+    let makeExportUri = (uri) => uri.with({
+            scheme: 'svg-export',
+            path: uri.path + '.rendered',
+            query: uri.toString()
+    });
+
+    vscode.workspace.onDidChangeTextDocument((event: vscode.TextDocumentChangeEvent) => {
+        if (event.document === vscode.window.activeTextEditor.document) {
+            exportProvider.update(makeExportUri(event.document.uri));
+        }
+    });
+
+    let openexport = vscode.commands.registerCommand('svgviewer.openexport', async function(uri) {
+        if (!(uri instanceof vscode.Uri)) {
+            if (vscode.window.activeTextEditor) {
+                uri = vscode.window.activeTextEditor.document.uri;
+            } else {
+                return;
+            }
+        }
+        let document = await vscode.workspace.openTextDocument(uri);
+        if (checkNoSvg(document)) {
+            vscode.window.showWarningMessage("Active editor doesn't show a SVG document - no properties to preview.");
+            return;
+        }
+        
+        return vscode.commands.executeCommand('vscode.previewHtml', makeExportUri(uri));
+    });
+
+    context.subscriptions.push(openexport);
+
+    let savedu = vscode.commands.registerCommand('svgviewer.savedu', async function(args) {
+        let data = new Buffer(args.du.split(',')[1], 'base64');
+        fs.writeFileSync(args.output, data);
+        vscode.window.showInformationMessage('export done. ' + args.output);
+    });
+
+    context.subscriptions.push(savedu);
 }
 function creatInputBox(param: string): Thenable<string> {
     return vscode.window.showInputBox({
@@ -93,9 +136,9 @@ function creatInputBox(param: string): Thenable<string> {
         validateInput: checkSizeInput
     });
 }
-function checkNoSvg(editor: vscode.TextEditor, displayMessage: boolean = true) {
+function checkNoSvg(document: vscode.TextDocument, displayMessage: boolean = true) {
 
-    let isNGType = !(editor.document.languageId === 'xml') || editor.document.getText().indexOf('</svg>') < 0;
+    let isNGType = !(document.languageId === 'xml') || document.getText().indexOf('</svg>') < 0;
     if (isNGType && displayMessage) {
         vscode.window.showWarningMessage("Active editor doesn't show a SVG document - no properties to preview.");
     }

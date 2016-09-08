@@ -31,6 +31,10 @@
       {
         "command": "svgviewer.copydui",
         "title": "SVG Viewer: Copy data URI scheme"
+      },
+      {
+        "command": "svgviewer.openexport",
+        "title": "SVG Viewer: (Experimental) Export PNG"
       }
     ],
     "keybindings": [
@@ -74,6 +78,7 @@
   },
   "dependencies": {
     "copy-paste": "^1.1.4",
+    "jquery": "^3.1.0",
     "node-cmd": "^1.1.1",
     "path": "^0.12.7",
     "pn": "^1.0.0",
