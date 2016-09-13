@@ -12,8 +12,6 @@ const svgexport = require('svgexport');
 const path = require('path');
 const phantomjs = require('phantomjs-prebuilt');
 export function activate(context: vscode.ExtensionContext) {
-
-    console.log('SVG Viewer is now active!');
     
     // Check PhantomJS Binary   
     if (!fs.existsSync(phantomjs.path)) {
