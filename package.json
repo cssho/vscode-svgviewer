@@ -34,7 +34,7 @@
       },
       {
         "command": "svgviewer.openexport",
-        "title": "SVG Viewer: (Experimental) Export PNG"
+        "title": "SVG Viewer: (Experimental) Export PNG by Canvas"
       }
     ],
     "keybindings": [
@@ -53,7 +53,12 @@
       {
         "command": "svgviewer.copydui",
         "key": "alt+s c"
+      },
+      {
+        "command": "svgviewer.openexport",
+        "key": "alt+s v"
       }
+
     ],
     "configuration": {
       "type": "object",

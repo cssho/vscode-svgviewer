@@ -26,6 +26,10 @@ SVGをPNGに変換
 ### Copy data URI scheme - `Alt+S C`
 SVGをdata URI schemeに変換し、クリップボードにコピー
 
+### View SVG and Export PNG by canvas - `Alt+S V`
+表示と変換
+Thanks @kexi
+
 ![preview](img/preview.png)
 
 ### Options

@@ -27,6 +27,10 @@ Convert from SVG to PNG with explicitly size
 ### Copy data URI scheme - `Alt+S C`
 Convert from SVG to data URI scheme and copy to the clipboard
 
+### View SVG and export PNG by Canvas - `Alt+S V`
+Display and Convert
+Thanks @kexi
+
 ![preview](img/preview.png)
 
 ### Options
