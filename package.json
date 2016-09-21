@@ -1,112 +1,111 @@
 {
-  "name": "vscode-svgviewer",
-  "displayName": "SVG Viewer",
-  "description": "SVG Viewer for Visual Studio Code.",
-  "version": "1.1.12",
-  "publisher": "cssho",
-  "engines": {
-    "vscode": "^0.10.8"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "*"
-  ],
-  "main": "./out/src/extension",
-  "contributes": {
-    "commands": [
-      {
-        "command": "svgviewer.open",
-        "title": "SVG Viewer: View SVG"
-      },
-      {
-        "command": "svgviewer.saveas",
-        "title": "SVG Viewer: Export PNG"
-      },
-      {
-        "command": "svgviewer.saveassize",
-        "title": "SVG Viewer: Export PNG explicitly set the size"
-      },
-      {
-        "command": "svgviewer.copydui",
-        "title": "SVG Viewer: Copy data URI scheme"
-      },
-      {
-        "command": "svgviewer.openexport",
-        "title": "SVG Viewer: (Experimental) Export PNG by Canvas"
-      }
+    "name": "vscode-svgviewer",
+    "displayName": "SVG Viewer",
+    "description": "SVG Viewer for Visual Studio Code.",
+    "version": "1.2.0",
+    "publisher": "cssho",
+    "engines": {
+        "vscode": "^0.10.8"
+    },
+    "categories": [
+        "Other"
     ],
-    "keybindings": [
-      {
-        "command": "svgviewer.open",
-        "key": "alt+s o"
-      },
-      {
-        "command": "svgviewer.saveas",
-        "key": "alt+s e"
-      },
-      {
-        "command": "svgviewer.saveassize",
-        "key": "alt+s x"
-      },
-      {
-        "command": "svgviewer.copydui",
-        "key": "alt+s c"
-      },
-      {
-        "command": "svgviewer.openexport",
-        "key": "alt+s v"
-      }
-
+    "activationEvents": [
+        "*"
     ],
-    "configuration": {
-      "type": "object",
-      "title": "VSCode SVG Viewer configuration",
-      "properties": {
-        "svgviewer.transparencygrid": {
-          "type": "boolean",
-          "default": true,
-          "description": "Show Transparency Grid"
+    "main": "./out/src/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "svgviewer.open",
+                "title": "SVG Viewer: View SVG"
+            },
+            {
+                "command": "svgviewer.saveas",
+                "title": "SVG Viewer: Export PNG"
+            },
+            {
+                "command": "svgviewer.saveassize",
+                "title": "SVG Viewer: Export PNG explicitly set the size"
+            },
+            {
+                "command": "svgviewer.copydui",
+                "title": "SVG Viewer: Copy data URI scheme"
+            },
+            {
+                "command": "svgviewer.openexport",
+                "title": "SVG Viewer: (Experimental) Export PNG by Canvas"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "svgviewer.open",
+                "key": "alt+s o"
+            },
+            {
+                "command": "svgviewer.saveas",
+                "key": "alt+s e"
+            },
+            {
+                "command": "svgviewer.saveassize",
+                "key": "alt+s x"
+            },
+            {
+                "command": "svgviewer.copydui",
+                "key": "alt+s c"
+            },
+            {
+                "command": "svgviewer.openexport",
+                "key": "alt+s v"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "VSCode SVG Viewer configuration",
+            "properties": {
+                "svgviewer.transparencygrid": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show Transparency Grid"
+                }
+            }
         }
-      }
-    }
-  },
-  "scripts": {
-    "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
-    "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install"
-  },
-  "devDependencies": {
-    "typescript": "^1.7.5",
-    "vscode": "^0.11.1"
-  },
-  "dependencies": {
-    "copy-paste": "^1.1.4",
-    "jquery": "^3.1.0",
-    "node-cmd": "^1.1.1",
-    "path": "^0.12.7",
-    "pn": "^1.0.0",
-    "svgexport": "^0.3.2",
-    "tmp": "0.0.28"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cssho/vscode-svgviewer.git"
-  },
-  "license": "MIT",
-  "icon": "icon.png",
-  "galleryBanner": {
-    "color": "#93E4D5",
-    "theme": "light"
-  },
-  "bugs": {
-    "url": "https://github.com/cssho/vscode-svgviewer/issues"
-  },
-  "homepage": "https://github.com/cssho/vscode-svgviewer/blob/master/README.md",
-  "keywords": [
-    "svg",
-    "viewer",
-    "image"
-  ]
+    },
+    "scripts": {
+        "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+        "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "devDependencies": {
+        "typescript": "^1.7.5",
+        "vscode": "^0.11.1"
+    },
+    "dependencies": {
+        "copy-paste": "^1.1.4",
+        "jquery": "^3.1.0",
+        "node-cmd": "^1.1.1",
+        "path": "^0.12.7",
+        "pn": "^1.0.0",
+        "svgexport": "^0.3.2",
+        "tmp": "0.0.28"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cssho/vscode-svgviewer.git"
+    },
+    "license": "MIT",
+    "icon": "icon.png",
+    "galleryBanner": {
+        "color": "#93E4D5",
+        "theme": "light"
+    },
+    "bugs": {
+        "url": "https://github.com/cssho/vscode-svgviewer/issues"
+    },
+    "homepage": "https://github.com/cssho/vscode-svgviewer/blob/master/README.md",
+    "keywords": [
+        "svg",
+        "viewer",
+        "image"
+    ]
 }
