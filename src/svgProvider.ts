@@ -40,13 +40,13 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
         if (showTransGrid) {
             transparencyGridCss = `
 <style type="text/css">
-.svgbg svg {
+.svgbg img {
   background:initial;
   background-image: url(data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAeUlEQVRYR+3XMQ4AIQhEUTiU9+/hUGy9Wk2G8luDIS8EMWdmYvF09+JtEUmBpieCJiA96AIiiKAswEsik10JCCIoCrAsiGBPOIK2YFWt/knOOW5Nv/ykQNMTQRMwEERQFWAOqmJ3PIIIigIMahHs3ahZt0xCetAEjA99oc8dGNmnIAAAAABJRU5ErkJggg==);
   background-position: left,top;
 }
 </style>`;
         }
-        return `<!DOCTYPE html><html><head>${transparencyGridCss}</head><body><div class="svgbg">${properties}</div></body></html>`;
+        return `<!DOCTYPE html><html><head>${transparencyGridCss}</head><body><div class="svgbg"><img src="data:image/svg+xml,${encodeURIComponent(properties)}"></div></body></html>`;
     }
 }
