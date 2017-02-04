@@ -15,19 +15,19 @@ SVG Viewer for Visual Studio Code
 
 ![palette](img/palette.png)
 
-### View SVG - `Alt+S O`
+### View SVG - `Alt+Shift+S O`
 Display SVG on an Editor
 
-### Export PNG - `Alt+S E`
+### Export PNG - `Alt+Shift+S E`
 Convert from SVG to PNG
 
-### Export PNG with explicitly size - `Alt+S X`
+### Export PNG with explicitly size - `Alt+Shift+S X`
 Convert from SVG to PNG with explicitly size
 
-### Copy data URI scheme - `Alt+S C`
+### Copy data URI scheme - `Alt+Shift+S C`
 Convert from SVG to data URI scheme and copy to the clipboard
 
-### View SVG and export PNG by Canvas - `Alt+S V`
+### View SVG and export PNG by Canvas - `Alt+Shift+S V`
 Display and Convert
 Thanks @kexi
 

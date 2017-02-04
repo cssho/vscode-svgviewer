@@ -2,7 +2,7 @@
     "name": "vscode-svgviewer",
     "displayName": "SVG Viewer",
     "description": "SVG Viewer for Visual Studio Code.",
-    "version": "1.3.0",
+    "version": "1.3.1",
     "publisher": "cssho",
     "engines": {
         "vscode": "^0.10.8"
@@ -11,14 +11,23 @@
         "Other"
     ],
     "activationEvents": [
+        "onLanguage:xml",
+        "onCommand:svgviewer.open",
+        "onCommand:svgviewer.saveas",
+        "onCommand:svgviewer.saveassize",
+        "onCommand:svgviewer.copydui",
+        "onCommand:svgviewer.openexport",
         "*"
     ],
     "main": "./out/src/extension",
     "contributes": {
-        "commands": [
-            {
+        "commands": [{
                 "command": "svgviewer.open",
-                "title": "SVG Viewer: View SVG"
+                "title": "SVG Viewer: View SVG",
+                "icon": {
+                    "light": "./media/preview-darkgray.svg",
+                    "dark": "./media/preview-lightgray.svg"
+                }
             },
             {
                 "command": "svgviewer.saveas",
@@ -37,26 +46,32 @@
                 "title": "SVG Viewer: (Experimental) Export PNG by Canvas"
             }
         ],
-        "keybindings": [
-            {
+        "menus": {
+            "editor/title": [{
+                "when": "resourceLangId == xml",
                 "command": "svgviewer.open",
-                "key": "alt+s o"
+                "group": "navigation"
+            }]
+        },
+        "keybindings": [{
+                "command": "svgviewer.open",
+                "key": "alt+shift+s o"
             },
             {
                 "command": "svgviewer.saveas",
-                "key": "alt+s e"
+                "key": "alt+shift+s e"
             },
             {
                 "command": "svgviewer.saveassize",
-                "key": "alt+s x"
+                "key": "alt+shift+s x"
             },
             {
                 "command": "svgviewer.copydui",
-                "key": "alt+s c"
+                "key": "alt+shift+s c"
             },
             {
                 "command": "svgviewer.openexport",
-                "key": "alt+s v"
+                "key": "alt+shift+s v"
             }
         ],
         "configuration": {
