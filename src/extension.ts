@@ -29,8 +29,10 @@ export function activate(context: vscode.ExtensionContext) {
     let registration = vscode.workspace.registerTextDocumentContentProvider('svg-preview', provider);
 
     vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
-        if (e.document === vscode.window.activeTextEditor.document && !checkNoSvg(vscode.window.activeTextEditor.document, false)) {
-            provider.update(previewUri);
+        if (vscode.window.activeTextEditor) {
+            if (e.document === vscode.window.activeTextEditor.document && !checkNoSvg(vscode.window.activeTextEditor.document, false)) {
+                provider.update(previewUri);
+            }
         }
     });
 
@@ -47,10 +49,12 @@ export function activate(context: vscode.ExtensionContext) {
     let saveas = vscode.commands.registerTextEditorCommand('svgviewer.saveas', (te, t) => {
         if (checkNoSvg(te.document)) return;
         let editor = vscode.window.activeTextEditor;
-        let text = editor.document.getText();
-        let tmpobj = tmp.fileSync({ 'postfix': '.svg' });
-        let pngpath = editor.document.uri.fsPath.replace('.svg', '.png');
-        exportPng(tmpobj, text, pngpath);
+        if (editor) {
+            let text = editor.document.getText();
+            let tmpobj = tmp.fileSync({ 'postfix': '.svg' });
+            let pngpath = editor.document.uri.fsPath.replace('.svg', '.png');
+            exportPng(tmpobj, text, pngpath);
+        }
     });
 
     context.subscriptions.push(saveas);
@@ -58,6 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
     let saveassize = vscode.commands.registerTextEditorCommand('svgviewer.saveassize', (te, t) => {
         if (checkNoSvg(te.document)) return;
         let editor = vscode.window.activeTextEditor;
+        if (!editor) return;
         let text = editor.document.getText();
         let tmpobj = tmp.fileSync({ 'postfix': '.svg' });
         let pngpath = editor.document.uri.fsPath.replace('.svg', '.png');
@@ -79,6 +84,7 @@ export function activate(context: vscode.ExtensionContext) {
     let copydu = vscode.commands.registerTextEditorCommand('svgviewer.copydui', (te, t) => {
         if (checkNoSvg(te.document)) return;
         let editor = vscode.window.activeTextEditor;
+        if (!editor) return;
         let text = editor.document.getText();
         cp.copy('data:image/svg+xml,' + encodeURIComponent(text));
     });
@@ -95,7 +101,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     vscode.workspace.onDidChangeTextDocument((event: vscode.TextDocumentChangeEvent) => {
-        if (event.document === vscode.window.activeTextEditor.document) {
+        if (vscode.window.activeTextEditor && event.document === vscode.window.activeTextEditor.document) {
             exportProvider.update(makeExportUri(event.document.uri));
         }
     });
@@ -143,7 +149,7 @@ function checkNoSvg(document: vscode.TextDocument, displayMessage: boolean = tru
     return isNGType;
 }
 
-function checkSizeInput(value: string): string {
+function checkSizeInput(value: string): string | null {
     return value !== '' && !isNaN(Number(value)) && Number(value) > 0
         ? null : 'Please set number.';
 }

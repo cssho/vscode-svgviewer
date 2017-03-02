@@ -23,7 +23,7 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
 
     private extractSnippet(): string {
         let editor = vscode.window.activeTextEditor;
-        let text = editor.document.getText();
+        let text = editor ? editor.document.getText() : '';
         return this.snippet(text);
     }
 
