@@ -12,7 +12,7 @@ const svgexport = require('svgexport');
 const path = require('path');
 const phantomjs = require('phantomjs-prebuilt');
 export function activate(context: vscode.ExtensionContext) {
-    
+
     // Check PhantomJS Binary   
     if (!fs.existsSync(phantomjs.path)) {
         exec('npm rebuild', { cwd: context.extensionPath });
@@ -36,12 +36,22 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
+    vscode.window.onDidChangeActiveTextEditor((textEditor: vscode.TextEditor) => {
+        if (vscode.window.activeTextEditor) {
+            if (textEditor.document === vscode.window.activeTextEditor.document && !checkNoSvg(vscode.window.activeTextEditor.document, false)) {
+                provider.update(previewUri);
+                let auto = vscode.workspace.getConfiguration('svgviewer').get('enableautopreview');
+                if (auto) {
+                    return openPreview(previewUri, textEditor.document.fileName);
+                }
+            }
+        }
+    });
+
     let open = vscode.commands.registerTextEditorCommand('svgviewer.open', (te, t) => {
         if (checkNoSvg(te.document)) return;
         provider.update(previewUri);
-        return vscode.commands.executeCommand('vscode.previewHtml', previewUri, vscode.ViewColumn.Two)
-            .then(s => console.log('done.'), vscode.window.showErrorMessage);
-
+        return openPreview(previewUri, te.document.fileName);
     });
 
     context.subscriptions.push(open);
@@ -93,11 +103,11 @@ export function activate(context: vscode.ExtensionContext) {
 
     let exportProvider = new ExportDocumentContentProvider(context);
     vscode.workspace.registerTextDocumentContentProvider('svg-export', exportProvider)
-    
+
     let makeExportUri = (uri) => uri.with({
-            scheme: 'svg-export',
-            path: uri.path + '.rendered',
-            query: uri.toString()
+        scheme: 'svg-export',
+        path: uri.path + '.rendered',
+        query: uri.toString()
     });
 
     vscode.workspace.onDidChangeTextDocument((event: vscode.TextDocumentChangeEvent) => {
@@ -106,7 +116,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    let openexport = vscode.commands.registerCommand('svgviewer.openexport', async function(uri) {
+    let openexport = vscode.commands.registerCommand('svgviewer.openexport', async function (uri) {
         if (!(uri instanceof vscode.Uri)) {
             if (vscode.window.activeTextEditor) {
                 uri = vscode.window.activeTextEditor.document.uri;
@@ -119,13 +129,13 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showWarningMessage("Active editor doesn't show a SVG document - no properties to preview.");
             return;
         }
-        
+
         return vscode.commands.executeCommand('vscode.previewHtml', makeExportUri(uri));
     });
 
     context.subscriptions.push(openexport);
 
-    let savedu = vscode.commands.registerCommand('svgviewer.savedu', async function(args) {
+    let savedu = vscode.commands.registerCommand('svgviewer.savedu', async function (args) {
         let data = new Buffer(args.du.split(',')[1], 'base64');
         fs.writeFileSync(args.output, data);
         vscode.window.showInformationMessage('export done. ' + args.output);
@@ -169,6 +179,28 @@ function exportPng(tmpobj: any, text: string, pngpath: string, w?: number, h?: n
                 });
         })
         .catch(e => vscode.window.showErrorMessage(e.message));
+}
+
+function openPreview(previewUri: vscode.Uri, fileName: string) {
+    let viewColumn: number;
+    switch (vscode.workspace.getConfiguration('svgviewer').get('previewcolumn')) {
+        case "One":
+            viewColumn = 1;
+            break;
+        case "Two":
+            viewColumn = 2;
+            break;
+        case "Three":
+            viewColumn = 3;
+            break;
+        default:
+            viewColumn = 0;
+            break;
+    }
+    if (viewColumn) {
+        return vscode.commands.executeCommand('vscode.previewHtml', previewUri, viewColumn, `Preview : ${fileName}`)
+            .then(s => console.log('done.'), vscode.window.showErrorMessage);
+    }
 }
 
 export function deactivate() {
