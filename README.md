@@ -39,6 +39,12 @@ The following Visual Studio Code setting is available for the SVG Viewer.  This 
 ```javascript
 {
     // Show Transparency Grid
-	"svgviewer.transparencygrid": true
+	"svgviewer.transparencygrid": true,
+
+    // Open or not open the preview screen automatically
+    "svgviewer.enableautopreview": true,
+
+    // How to open the screen (vscode.ViewColumn)
+    "svgviewer.previewcolumn": true
 }
 ```

@@ -38,6 +38,12 @@ SVG Viewerでは以下のVisual Studio Codeの設定が可能です。`User Sett
 ```javascript
 {
     // 透明グリッドを表示
-	"svgviewer.transparencygrid": true
+	"svgviewer.transparencygrid": true,    
+
+    // プレビューを自動的に開く
+    "svgviewer.enableautopreview": true,
+
+    // プレビューの開き方を指定 (vscode.ViewColumn)
+    "svgviewer.previewcolumn": "One"
 }
 ```
