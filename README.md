@@ -48,7 +48,3 @@ The following Visual Studio Code setting is available for the SVG Viewer.  This 
     "svgviewer.previewcolumn": true
 }
 ```
-## Support on Beerpay
-Hey dude! Help me out for a couple of :beers:!
-
-[![Beerpay](https://beerpay.io/cssho/vscode-svgviewer/badge.svg?style=beer-square)](https://beerpay.io/cssho/vscode-svgviewer)  [![Beerpay](https://beerpay.io/cssho/vscode-svgviewer/make-wish.svg?style=flat-square)](https://beerpay.io/cssho/vscode-svgviewer?focus=wish)
