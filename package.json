@@ -13,6 +13,7 @@
     "activationEvents": [
         "onLanguage:xml",
         "onCommand:svgviewer.open",
+        "onCommand:svgviewer.openfile",
         "onCommand:svgviewer.saveas",
         "onCommand:svgviewer.saveassize",
         "onCommand:svgviewer.copydui",
@@ -28,6 +29,10 @@
                     "light": "./media/preview-darkgray.svg",
                     "dark": "./media/preview-lightgray.svg"
                 }
+            },
+            {
+                "command": "svgviewer.openfile",
+                "title": "SVG Viewer: View SVG File"
             },
             {
                 "command": "svgviewer.saveas",
@@ -51,6 +56,11 @@
                 "when": "resourceLangId == xml",
                 "command": "svgviewer.open",
                 "group": "navigation"
+            }],
+            "explorer/context": [{
+                "command": "svgviewer.openfile",
+                "group": "extension",
+                "when": "resourceLangId  == xml"
             }]
         },
         "keybindings": [{
