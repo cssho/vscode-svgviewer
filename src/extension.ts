@@ -1,7 +1,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { SvgDocumentContentProvider } from './svgProvider';
+import { SvgDocumentContentProvider, SvgFileContentProvider } from './svgProvider';
 import { ExportDocumentContentProvider } from './exportProvider';
 
 const exec = require('sync-exec');
@@ -27,6 +27,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     let provider = new SvgDocumentContentProvider();
     let registration = vscode.workspace.registerTextDocumentContentProvider('svg-preview', provider);
+
+    let fileUriProviders = new Map<string, { uri: vscode.Uri, provider: SvgFileContentProvider, registration: vscode.Disposable }>();
 
     vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
         if (vscode.window.activeTextEditor) {
@@ -55,6 +57,32 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     context.subscriptions.push(open);
+
+    let openfile = vscode.commands.registerCommand('svgviewer.openfile', async function (uri) {
+        if (!(uri instanceof vscode.Uri)) {
+            return;
+        }
+        let document = await vscode.workspace.openTextDocument(uri);
+        if (checkNoSvg(document, false)) {
+            vscode.window.showWarningMessage("Selected file is not an SVG document - no properties to preview.");
+            return;
+        }
+
+        let fName = vscode.workspace.asRelativePath(document.fileName);
+        let fileUriProvider = fileUriProviders.get(fName);
+        if (fileUriProvider == undefined) {
+            let fileUri = vscode.Uri.parse('svg-preview-' + fName.replace(/(\\|\/)/g, '-') + '://authority/svg-preview');
+            let fileProvider = new SvgFileContentProvider(fileUri, document.fileName);
+            let fileRegistration = vscode.workspace.registerTextDocumentContentProvider('svg-preview-' + fName.replace(/(\\|\/)/g, '-'), fileProvider);
+            fileUriProviders.set(fName, { uri: fileUri, provider: fileProvider, registration: fileRegistration });
+            return openPreview(fileUri, fName);
+        } else {
+            fileUriProvider.provider.update(fileUriProvider.uri);
+            return openPreview(fileUriProvider.uri, fName);
+        }
+    });
+
+    context.subscriptions.push(openfile);
 
     let saveas = vscode.commands.registerTextEditorCommand('svgviewer.saveas', (te, t) => {
         if (checkNoSvg(te.document)) return;

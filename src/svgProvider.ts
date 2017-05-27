@@ -1,6 +1,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import fs = require('fs')
 
 export class SvgDocumentContentProvider implements vscode.TextDocumentContentProvider {
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
@@ -21,7 +22,7 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
         return this.extractSnippet();
     }
 
-    private extractSnippet(): string {
+    protected extractSnippet(): string {
         let editor = vscode.window.activeTextEditor;
         let text = editor ? editor.document.getText() : '';
         return this.snippet(text);
@@ -34,7 +35,7 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
                 </body>`;
     }
 
-    private snippet(properties): string {
+    protected snippet(properties): string {
         let showTransGrid = vscode.workspace.getConfiguration('svgviewer').get('transparencygrid');
         let transparencyGridCss = '';
         if (showTransGrid) {
@@ -48,5 +49,22 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
 </style>`;
         }
         return `<!DOCTYPE html><html><head>${transparencyGridCss}</head><body><div class="svgbg"><img src="data:image/svg+xml,${encodeURIComponent(properties)}"></div></body></html>`;
+    }
+}
+
+export class SvgFileContentProvider extends SvgDocumentContentProvider {
+    filename: string;
+    constructor(previewUri: vscode.Uri, filename: string) {
+        super();
+        this.filename = filename;
+        vscode.workspace.createFileSystemWatcher(this.filename, true, false, true).onDidChange((e: vscode.Uri) => {
+            this.update(previewUri);
+        });
+    }
+
+    protected extractSnippet(): string {
+        let fileText = fs.readFileSync(this.filename, 'utf8');
+        let text = fileText ? fileText : '';
+        return super.snippet(text);
     }
 }
