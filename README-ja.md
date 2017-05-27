@@ -6,6 +6,10 @@ SVG Viewer for Visual Studio Code
 [![](https://vsmarketplacebadge.apphb.com/installs/cssho.vscode-svgviewer.svg)](https://marketplace.visualstudio.com/items?itemName=cssho.vscode-svgviewer)
 [![](https://vsmarketplacebadge.apphb.com/rating/cssho.vscode-svgviewer.svg)](https://marketplace.visualstudio.com/items?itemName=cssho.vscode-svgviewer)
 
+## Easy way to preview
+EXPLORERのコンテキストメニューからSVGをプレビューする
+![palette](img/from_context.gif)
+
 ## Usage 
 0. コマンドパレットを表示し、入力欄に`ext install SVG Viewer`と入力
 0. Enterを押下し、VSCodeを再起動
