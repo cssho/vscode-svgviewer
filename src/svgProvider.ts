@@ -3,11 +3,26 @@
 import * as vscode from 'vscode';
 import fs = require('fs')
 
+export function getSvgUri(uri: vscode.Uri) {
+    if (uri.scheme === 'svg-preview') {
+        return uri;
+    }
+
+    return uri.with({
+        scheme: 'svg-preview',
+        path: uri.path + '.rendered',
+        query: uri.toString()
+    });
+}
+
 export class SvgDocumentContentProvider implements vscode.TextDocumentContentProvider {
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
+    private _waiting: boolean = false;
 
-    public provideTextDocumentContent(uri: vscode.Uri): string {
-        return this.createSvgSnippet();
+    public provideTextDocumentContent(uri: vscode.Uri): Thenable<string> {
+        let sourceUri = vscode.Uri.parse(uri.query);
+        console.log(sourceUri);
+        return vscode.workspace.openTextDocument(sourceUri).then(document => this.snippet(document.getText()));
     }
 
     get onDidChange(): vscode.Event<vscode.Uri> {
@@ -15,24 +30,13 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
     }
 
     public update(uri: vscode.Uri) {
-        this._onDidChange.fire(uri);
-    }
-
-    private createSvgSnippet() {
-        return this.extractSnippet();
-    }
-
-    protected extractSnippet(): string {
-        let editor = vscode.window.activeTextEditor;
-        let text = editor ? editor.document.getText() : '';
-        return this.snippet(text);
-    }
-
-    private errorSnippet(error: string): string {
-        return `
-                <body>
-                    ${error}
-                </body>`;
+        if (!this._waiting) {
+            this._waiting = true;
+            setTimeout(() => {
+                this._waiting = false;
+                this._onDidChange.fire(uri);
+            }, 300);
+        }
     }
 
     protected snippet(properties): string {

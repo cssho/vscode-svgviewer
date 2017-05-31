@@ -2,7 +2,7 @@
     "name": "vscode-svgviewer",
     "displayName": "SVG Viewer",
     "description": "SVG Viewer for Visual Studio Code.",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "publisher": "cssho",
     "engines": {
         "vscode": "^1.9.0"
@@ -22,7 +22,8 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
-        "commands": [{
+        "commands": [
+            {
                 "command": "svgviewer.open",
                 "title": "SVG Viewer: View SVG",
                 "icon": {
@@ -52,18 +53,23 @@
             }
         ],
         "menus": {
-            "editor/title": [{
-                "when": "resourceLangId == xml",
-                "command": "svgviewer.open",
-                "group": "navigation"
-            }],
-            "explorer/context": [{
-                "command": "svgviewer.openfile",
-                "group": "extension",
-                "when": "resourceLangId  == xml"
-            }]
+            "editor/title": [
+                {
+                    "when": "resourceLangId == xml",
+                    "command": "svgviewer.open",
+                    "group": "navigation"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "command": "svgviewer.openfile",
+                    "group": "extension",
+                    "when": "resourceLangId  == xml"
+                }
+            ]
         },
-        "keybindings": [{
+        "keybindings": [
+            {
                 "command": "svgviewer.open",
                 "key": "alt+shift+s o"
             },

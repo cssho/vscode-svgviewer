@@ -1,7 +1,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { SvgDocumentContentProvider, SvgFileContentProvider } from './svgProvider';
+import { SvgDocumentContentProvider, SvgFileContentProvider, getSvgUri } from './svgProvider';
 import { ExportDocumentContentProvider } from './exportProvider';
 
 const exec = require('sync-exec');
@@ -23,8 +23,6 @@ export function activate(context: vscode.ExtensionContext) {
             path.join(path.dirname(phantomjs.path), 'phantom', 'bin', 'phantomjs');
     }
 
-    let previewUri = vscode.Uri.parse('svg-preview://authority/svg-preview');
-
     let provider = new SvgDocumentContentProvider();
     let registration = vscode.workspace.registerTextDocumentContentProvider('svg-preview', provider);
 
@@ -33,7 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
         if (vscode.window.activeTextEditor) {
             if (e.document === vscode.window.activeTextEditor.document && !checkNoSvg(vscode.window.activeTextEditor.document, false)) {
-                provider.update(previewUri);
+                provider.update(getSvgUri(e.document.uri));
             }
         }
     });
@@ -41,10 +39,10 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window.onDidChangeActiveTextEditor((textEditor: vscode.TextEditor) => {
         if (vscode.window.activeTextEditor) {
             if (textEditor.document === vscode.window.activeTextEditor.document && !checkNoSvg(vscode.window.activeTextEditor.document, false)) {
-                provider.update(previewUri);
+                provider.update(getSvgUri(textEditor.document.uri))
                 let auto = vscode.workspace.getConfiguration('svgviewer').get('enableautopreview');
                 if (auto) {
-                    return openPreview(previewUri, textEditor.document.fileName);
+                    return openPreview(textEditor.document.uri, textEditor.document.fileName);
                 }
             }
         }
@@ -52,8 +50,8 @@ export function activate(context: vscode.ExtensionContext) {
 
     let open = vscode.commands.registerTextEditorCommand('svgviewer.open', (te, t) => {
         if (checkNoSvg(te.document)) return;
-        provider.update(previewUri);
-        return openPreview(previewUri, te.document.fileName);
+        provider.update(getSvgUri(te.document.uri))
+        return openPreview(te.document.uri, te.document.fileName);
     });
 
     context.subscriptions.push(open);
@@ -71,15 +69,15 @@ export function activate(context: vscode.ExtensionContext) {
         let fName = vscode.workspace.asRelativePath(document.fileName);
         let fileUriProvider = fileUriProviders.get(fName);
         if (fileUriProvider == undefined) {
-            let fileUri = vscode.Uri.parse('svg-preview-' + fName.replace(/(\\|\/)/g, '-') + '://authority/svg-preview');
+            let fileUri = getSvgUri(uri);
             let fileProvider = new SvgFileContentProvider(fileUri, document.fileName);
-            let fileRegistration = vscode.workspace.registerTextDocumentContentProvider('svg-preview-' + fName.replace(/(\\|\/)/g, '-'), fileProvider);
-            fileUriProviders.set(fName, { uri: fileUri, provider: fileProvider, registration: fileRegistration });
-            return openPreview(fileUri, fName);
+            let fileRegistration = vscode.workspace.registerTextDocumentContentProvider('svg-preview', fileProvider);
+            fileUriProvider = { uri: fileUri, provider: fileProvider, registration: fileRegistration };
+            fileUriProviders.set(fName, fileUriProvider);
         } else {
             fileUriProvider.provider.update(fileUriProvider.uri);
-            return openPreview(fileUriProvider.uri, fName);
         }
+        return openPreview(fileUriProvider.uri, fName);
     });
 
     context.subscriptions.push(openfile);
@@ -226,7 +224,7 @@ function openPreview(previewUri: vscode.Uri, fileName: string) {
             break;
     }
     if (viewColumn) {
-        return vscode.commands.executeCommand('vscode.previewHtml', previewUri, viewColumn, `Preview : ${fileName}`)
+        return vscode.commands.executeCommand('vscode.previewHtml', getSvgUri(previewUri), viewColumn, `Preview : ${fileName}`)
             .then(s => console.log('done.'), vscode.window.showErrorMessage);
     }
 }
