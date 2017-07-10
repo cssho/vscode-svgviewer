@@ -13,7 +13,7 @@ const path = require('path');
 const phantomjs = require('phantomjs-prebuilt');
 export function activate(context: vscode.ExtensionContext) {
 
-    // Check PhantomJS Binary   
+    // Check PhantomJS Binary
     if (!fs.existsSync(phantomjs.path)) {
         exec('npm rebuild', { cwd: context.extensionPath });
         process.env.PHANTOMJS_PLATFORM = process.platform;
@@ -178,7 +178,7 @@ function creatInputBox(param: string): Thenable<string> {
 }
 function checkNoSvg(document: vscode.TextDocument, displayMessage: boolean = true) {
 
-    let isNGType = !(document.languageId === 'xml') || document.getText().indexOf('</svg>') < 0;
+    let isNGType = document.languageId !== 'xml' && document.getText().indexOf('</svg>') < 0;
     if (isNGType && displayMessage) {
         vscode.window.showWarningMessage("Active editor doesn't show a SVG document - no properties to preview.");
     }
