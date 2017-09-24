@@ -169,7 +169,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(savedu);
 }
-function creatInputBox(param: string): Thenable<string> {
+function creatInputBox(param: string): Thenable<string | undefined> {
     return vscode.window.showInputBox({
         prompt: `Set ${param} of the png.`,
         placeHolder: `${param}`,

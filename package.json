@@ -99,6 +99,9 @@
                     "default": true,
                     "description": "Show Transparency Grid"
                 },
+                "svgviewer.transparencycolor": {
+                    "type": "string"
+                },
                 "svgviewer.enableautopreview": {
                     "type": "boolean",
                     "default": false,
