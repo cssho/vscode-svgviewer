@@ -41,7 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
             if (textEditor.document === vscode.window.activeTextEditor.document && !checkNoSvg(vscode.window.activeTextEditor.document, false)) {
                 provider.update(getSvgUri(textEditor.document.uri))
                 let auto = vscode.workspace.getConfiguration('svgviewer').get('enableautopreview');
-                if (auto) {
+                if (auto && !provider.exist(getSvgUri(textEditor.document.uri))) {
                     return openPreview(textEditor.document.uri, textEditor.document.fileName);
                 }
             }
