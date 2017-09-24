@@ -29,6 +29,11 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
         return this._onDidChange.event;
     }
 
+    public exist(uri: vscode.Uri): boolean {
+        return vscode.workspace.textDocuments
+            .find(x => x.uri.path === uri.path && x.uri.scheme === uri.scheme) !== undefined;
+    }
+
     public update(uri: vscode.Uri) {
         if (!this._waiting) {
             this._waiting = true;
@@ -51,7 +56,7 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
     background: `+ transparencycolor + `;
 }
 </style>`;
-                            } else {
+            } else {
                 transparencyGridCss = `
 <style type="text/css">
 .svgbg img {
