@@ -167,5 +167,6 @@
         "svg",
         "viewer",
         "image"
-    ]
+    ],
+    "enableProposedApi": true
 }

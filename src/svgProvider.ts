@@ -138,3 +138,106 @@ export class SvgFileContentProvider extends SvgDocumentContentProvider {
         return super.snippet(text);
     }
 }
+
+export class NewSvgDocumentContentProvider {
+
+    protected snippet(properties): string {
+        let showTransGrid = vscode.workspace.getConfiguration('svgviewer').get('transparencygrid');
+        let transparencycolor = vscode.workspace.getConfiguration('svgviewer').get('transparencycolor');
+        let transparencyGridCss = '';
+        if (showTransGrid) {
+            if (transparencycolor != null && transparencycolor !== "") {
+                transparencyGridCss = `
+<style type="text/css">
+.svgbg img {
+    background: `+ transparencycolor + `;
+}
+</style>`;
+            } else {
+                transparencyGridCss = `
+<style type="text/css">
+.svgbg img {
+    background:initial;
+    background-image: url(data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAeUlEQVRYR+3XMQ4AIQhEUTiU9+/hUGy9Wk2G8luDIS8EMWdmYvF09+JtEUmBpieCJiA96AIiiKAswEsik10JCCIoCrAsiGBPOIK2YFWt/knOOW5Nv/ykQNMTQRMwEERQFWAOqmJ3PIIIigIMahHs3ahZt0xCetAEjA99oc8dGNmnIAAAAABJRU5ErkJggg==);
+    background-position: left,top;
+}
+</style>`;
+            }
+        }
+        return `<!DOCTYPE html><html><head>${transparencyGridCss}</head><body><div class="svgbg"><img src="data:image/svg+xml,${encodeURIComponent(properties)}"></div></body></html>`;
+    }
+
+    public async provideTextDocumentContent(sourceUri: vscode.Uri): Promise<string> {
+        const document = await vscode.workspace.openTextDocument(sourceUri);
+        return this.snippet(document.getText);
+    }
+}
+
+export class SvgPreviewWebviewManager {
+    private readonly webviews = new Map<string, vscode.Webview>();
+
+    private readonly disposables: vscode.Disposable[] = [];
+
+    public constructor(
+        private readonly contentProvider: NewSvgDocumentContentProvider
+    ) {
+        vscode.workspace.onDidSaveTextDocument(document => {
+            this.update(document.uri);
+        }, null, this.disposables);
+
+        vscode.workspace.onDidChangeTextDocument(event => {
+            this.update(event.document.uri);
+        }, null, this.disposables);
+    }
+
+    public dispose(): void {
+        while (this.disposables.length) {
+            const item = this.disposables.pop();
+            if (item) {
+                item.dispose();
+            }
+        }
+        this.webviews.clear();
+    }
+
+    public update(uri: vscode.Uri) {
+        const webview = this.webviews.get(uri.fsPath);
+        if (webview) {
+            this.contentProvider.provideTextDocumentContent(uri).then(x => webview.html = x);
+        }
+    }
+
+    public updateAll() {
+        for (const resource of this.webviews.keys()) {
+            const sourceUri = vscode.Uri.parse(resource);
+            this.update(sourceUri);
+        }
+    }
+
+    public create(
+        resource: vscode.Uri,
+        viewColumn: vscode.ViewColumn,
+        previewTitle: string
+    ) {
+        const view = vscode.window.createWebview(
+            previewTitle,
+            viewColumn, { enableScripts: true });
+
+        this.contentProvider.provideTextDocumentContent(resource).then(x => view.html = x);
+
+        view.onMessage(e => {
+            vscode.commands.executeCommand(e.command, ...e.args);
+        });
+
+        view.onBecameActive(() => {
+            vscode.commands.executeCommand('setContext', 'svgPreview', true);
+        });
+
+        view.onBecameInactive(() => {
+            vscode.commands.executeCommand('setContext', 'svgPreview', false);
+        });
+
+        this.webviews.set(resource.fsPath, view);
+        return view;
+    }
+}

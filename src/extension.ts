@@ -1,8 +1,11 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import { SvgDocumentContentProvider, SvgFileContentProvider, getSvgUri } from './svgProvider';
+import { SvgDocumentContentProvider, SvgFileContentProvider, getSvgUri, NewSvgDocumentContentProvider, SvgPreviewWebviewManager } from './svgProvider';
 import { ExportDocumentContentProvider } from './exportProvider';
+import { ViewColumn } from 'vscode';
+import { CommandManager } from './commandManager';
+import { ShowPreviewCommand } from './commands/showPreview'
 
 import exec = require('sync-exec');
 import fs = require('pn/fs');
@@ -24,38 +27,23 @@ export function activate(context: vscode.ExtensionContext) {
             path.join(path.dirname(phantomjs.path), 'phantom', 'bin', 'phantomjs');
     }
 
-    let provider = new SvgDocumentContentProvider(context);
-    let registration = vscode.workspace.registerTextDocumentContentProvider('svg-preview', provider);
+    const newProvider = new NewSvgDocumentContentProvider();
+    const webviewManager = new SvgPreviewWebviewManager(newProvider);
+    context.subscriptions.push(webviewManager);
 
     let fileUriProviders = new Map<string, { uri: vscode.Uri, provider: SvgFileContentProvider, registration: vscode.Disposable }>();
 
-    vscode.workspace.onDidChangeTextDocument((e: vscode.TextDocumentChangeEvent) => {
-        if (vscode.window.activeTextEditor) {
-            if (e.document === vscode.window.activeTextEditor.document && !checkNoSvg(vscode.window.activeTextEditor.document, false)) {
-                provider.update(getSvgUri(e.document.uri));
-            }
-        }
-    });
+    const commandManager = new CommandManager();
+	context.subscriptions.push(commandManager);
+	commandManager.register(new ShowPreviewCommand(webviewManager));
+    // let open = vscode.commands.registerCommand('svgviewer.open', (te, t) => {
+    //     if (checkNoSvg(te.document)) return;
+    //     webviewManager.update(getSvgUri(te.document.uri))
+    //     return openPreview(te.document.uri, te.document.fileName);
+    // });
 
-    vscode.window.onDidChangeActiveTextEditor((textEditor: vscode.TextEditor) => {
-        if (vscode.window.activeTextEditor) {
-            if (textEditor.document === vscode.window.activeTextEditor.document && !checkNoSvg(vscode.window.activeTextEditor.document, false)) {
-                provider.update(getSvgUri(textEditor.document.uri))
-                let auto = vscode.workspace.getConfiguration('svgviewer').get('enableautopreview');
-                if (auto && !provider.exist(getSvgUri(textEditor.document.uri))) {
-                    return openPreview(textEditor.document.uri, textEditor.document.fileName);
-                }
-            }
-        }
-    });
-
-    let open = vscode.commands.registerTextEditorCommand('svgviewer.open', (te, t) => {
-        if (checkNoSvg(te.document)) return;
-        provider.update(getSvgUri(te.document.uri))
-        return openPreview(te.document.uri, te.document.fileName);
-    });
-
-    context.subscriptions.push(open);
+    // context.subscriptions.push(open);
+    
 
     let openfile = vscode.commands.registerCommand('svgviewer.openfile', async function (uri) {
         if (!(uri instanceof vscode.Uri)) {
@@ -169,6 +157,29 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     context.subscriptions.push(savedu);
+
+    function openPreview(previewUri: vscode.Uri, fileName: string) {
+        let viewColumn: ViewColumn;
+        switch (vscode.workspace.getConfiguration('svgviewer').get('previewcolumn')) {
+            case "One":
+                viewColumn = ViewColumn.One;
+                break;
+            case "Two":
+                viewColumn = ViewColumn.Two;
+                break;
+            case "Three":
+                viewColumn = ViewColumn.Three;
+                break;
+            default:
+                viewColumn = 0;
+                break;
+        }
+        if (viewColumn) {
+            return webviewManager.create(getSvgUri(previewUri), viewColumn, `Preview : ${fileName}`);
+            // return vscode.commands.executeCommand('vscode.previewHtml', getSvgUri(previewUri), viewColumn, `Preview : ${fileName}`)
+            //     .then(s => console.log('done.'), vscode.window.showErrorMessage);
+        }
+    }
 }
 function creatInputBox(param: string): Thenable<string | undefined> {
     return vscode.window.showInputBox({
@@ -208,27 +219,7 @@ function exportPng(tmpobj: any, text: string, pngpath: string, w?: number, h?: n
         .catch(e => vscode.window.showErrorMessage(e.message));
 }
 
-function openPreview(previewUri: vscode.Uri, fileName: string) {
-    let viewColumn: number;
-    switch (vscode.workspace.getConfiguration('svgviewer').get('previewcolumn')) {
-        case "One":
-            viewColumn = 1;
-            break;
-        case "Two":
-            viewColumn = 2;
-            break;
-        case "Three":
-            viewColumn = 3;
-            break;
-        default:
-            viewColumn = 0;
-            break;
-    }
-    if (viewColumn) {
-        return vscode.commands.executeCommand('vscode.previewHtml', getSvgUri(previewUri), viewColumn, `Preview : ${fileName}`)
-            .then(s => console.log('done.'), vscode.window.showErrorMessage);
-    }
-}
+
 
 export function deactivate() {
 }
