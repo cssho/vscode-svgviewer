@@ -55,7 +55,7 @@
         "menus": {
             "editor/title": [
                 {
-                    "when": "resourceLangId == xml",
+                    "when": "editorLangId == xml",
                     "command": "svgviewer.open",
                     "group": "navigation"
                 }
