@@ -22,6 +22,9 @@ Viewing an SVG file from explorer context menu.
 ### View SVG - `Alt+Shift+S O`
 Display SVG on an Editor
 
+#### Zoom in/out
+Holding ctrl/cmd and using mouse wheel(up/down)
+
 ### Export PNG - `Alt+Shift+S E`
 Convert from SVG to PNG
 

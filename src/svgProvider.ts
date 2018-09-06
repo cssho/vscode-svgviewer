@@ -1,6 +1,7 @@
 'use strict';
 
 import * as vscode from 'vscode';
+import * as path from 'path';
 import fs = require('fs')
 
 export function getSvgUri(uri: vscode.Uri) {
@@ -18,6 +19,8 @@ export function getSvgUri(uri: vscode.Uri) {
 export class SvgDocumentContentProvider implements vscode.TextDocumentContentProvider {
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
     private _waiting: boolean = false;
+
+    public constructor(protected context: vscode.ExtensionContext) {}
 
     public provideTextDocumentContent(uri: vscode.Uri): Thenable<string> {
         let sourceUri = vscode.Uri.parse(uri.query);
@@ -44,6 +47,10 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
         }
     }
 
+    private getPath(file: string): string {
+        return path.join(this.context.extensionPath, file);
+    }
+
     protected snippet(properties): string {
         let showTransGrid = vscode.workspace.getConfiguration('svgviewer').get('transparencygrid');
         let transparencycolor = vscode.workspace.getConfiguration('svgviewer').get('transparencycolor');
@@ -54,6 +61,7 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
 <style type="text/css">
 .svgbg img {
     background: `+ transparencycolor + `;
+    transform-origin: top left;
 }
 </style>`;
             } else {
@@ -63,18 +71,24 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
     background:initial;
     background-image: url(data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAeUlEQVRYR+3XMQ4AIQhEUTiU9+/hUGy9Wk2G8luDIS8EMWdmYvF09+JtEUmBpieCJiA96AIiiKAswEsik10JCCIoCrAsiGBPOIK2YFWt/knOOW5Nv/ykQNMTQRMwEERQFWAOqmJ3PIIIigIMahHs3ahZt0xCetAEjA99oc8dGNmnIAAAAABJRU5ErkJggg==);
     background-position: left,top;
+    transform-origin: top left;
 }
 </style>`;
             }
         }
-        return `<!DOCTYPE html><html><head>${transparencyGridCss}</head><body><div class="svgbg"><img src="data:image/svg+xml,${encodeURIComponent(properties)}"></div></body></html>`;
+
+        return `<!DOCTYPE html><html><head>${transparencyGridCss}
+<script src="${this.getPath('media/preview.js')}"></script>
+</script></head><body>
+        <div class="svgbg"><img id="svgimg" src="data:image/svg+xml,${encodeURIComponent(properties)}"></div>
+        </body></html>`;
     }
 }
 
 export class SvgFileContentProvider extends SvgDocumentContentProvider {
     filename: string;
-    constructor(previewUri: vscode.Uri, filename: string) {
-        super();
+    constructor(protected context: vscode.ExtensionContext,previewUri: vscode.Uri, filename: string) {
+        super(context);
         this.filename = filename;
         vscode.workspace.createFileSystemWatcher(this.filename, true, false, true).onDidChange((e: vscode.Uri) => {
             this.update(previewUri);

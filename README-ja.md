@@ -21,6 +21,9 @@ EXPLORERのコンテキストメニューからSVGをプレビューする
 ### View SVG - `Alt+Shift+S O`
 SVGをエディタ上で表示
 
+#### 拡大/縮小
+ctrl/cmdキーを押しながらマウスホイールを上下
+
 ### Export PNG - `Alt+Shift+S E`
 SVGをPNGに変換
 
