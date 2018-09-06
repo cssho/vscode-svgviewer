@@ -23,7 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
             path.join(path.dirname(phantomjs.path), 'phantom', 'bin', 'phantomjs');
     }
 
-    let provider = new SvgDocumentContentProvider();
+    let provider = new SvgDocumentContentProvider(context);
     let registration = vscode.workspace.registerTextDocumentContentProvider('svg-preview', provider);
 
     let fileUriProviders = new Map<string, { uri: vscode.Uri, provider: SvgFileContentProvider, registration: vscode.Disposable }>();
@@ -70,7 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
         let fileUriProvider = fileUriProviders.get(fName);
         if (fileUriProvider == undefined) {
             let fileUri = getSvgUri(uri);
-            let fileProvider = new SvgFileContentProvider(fileUri, document.fileName);
+            let fileProvider = new SvgFileContentProvider(context, fileUri, document.fileName);
             let fileRegistration = vscode.workspace.registerTextDocumentContentProvider('svg-preview', fileProvider);
             fileUriProvider = { uri: fileUri, provider: fileProvider, registration: fileRegistration };
             fileUriProviders.set(fName, fileUriProvider);
