@@ -2,7 +2,7 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
-import fs = require('fs')
+import fs = require('fs');
 
 export function getSvgUri(uri: vscode.Uri) {
     if (uri.scheme === 'svg-preview') {
@@ -19,12 +19,14 @@ export function getSvgUri(uri: vscode.Uri) {
 export class SvgDocumentContentProvider implements vscode.TextDocumentContentProvider {
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
     private _waiting: boolean = false;
+    private _resourceDir: string;
 
-    public constructor(protected context: vscode.ExtensionContext) {}
+    public constructor(protected context: vscode.ExtensionContext) { }
 
     public provideTextDocumentContent(uri: vscode.Uri): Thenable<string> {
         let sourceUri = vscode.Uri.parse(uri.query);
         console.log(sourceUri);
+        this._resourceDir = path.dirname(sourceUri.fsPath);
         return vscode.workspace.openTextDocument(sourceUri).then(document => this.snippet(document.getText()));
     }
 
@@ -51,7 +53,17 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
         return path.join(this.context.extensionPath, file);
     }
 
-    protected snippet(properties): string {
+    private getWorkspacePath(file: string): string {
+        return path.join(this._resourceDir, file);
+    }
+
+    private insertCss(svg: string, index: number, css: string[]): string {
+        return svg.slice(0, index)
+            + `<style type="text/css"><![CDATA[${fs.readFileSync(this.getWorkspacePath('style8.css'))}]]></style>`
+            + svg.slice(index, svg.length);
+    }
+
+    protected snippet(properties: string): string {
         let showTransGrid = vscode.workspace.getConfiguration('svgviewer').get('transparencygrid');
         let transparencycolor = vscode.workspace.getConfiguration('svgviewer').get('transparencycolor');
         let transparencyGridCss = '';
@@ -76,18 +88,19 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
 </style>`;
             }
         }
-
-        return `<!DOCTYPE html><html><head>${transparencyGridCss}
+        let defsEndIndex = properties.indexOf('</defs>');
+        let html = `<!DOCTYPE html><html><head>${transparencyGridCss}
 <script src="${this.getPath('media/preview.js')}"></script>
 </script></head><body>
-        <div class="svgbg"><img id="svgimg" src="data:image/svg+xml,${encodeURIComponent(properties)}"></div>
+        <div class="svgbg"><img id="svgimg" src="data:image/svg+xml,${encodeURIComponent(this.insertCss(properties,defsEndIndex,null))}"></div>
         </body></html>`;
+        return html;
     }
 }
 
 export class SvgFileContentProvider extends SvgDocumentContentProvider {
     filename: string;
-    constructor(protected context: vscode.ExtensionContext,previewUri: vscode.Uri, filename: string) {
+    constructor(protected context: vscode.ExtensionContext, previewUri: vscode.Uri, filename: string) {
         super(context);
         this.filename = filename;
         vscode.workspace.createFileSystemWatcher(this.filename, true, false, true).onDidChange((e: vscode.Uri) => {
