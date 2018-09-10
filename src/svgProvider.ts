@@ -57,12 +57,30 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
         return path.join(this._resourceDir, file);
     }
 
-    private insertCss(svg: string, index: number, css: string[]): string {
-        return svg.slice(0, index)
-            + `<style type="text/css"><![CDATA[${fs.readFileSync(this.getWorkspacePath('style8.css'))}]]></style>`
-            + svg.slice(index, svg.length);
+    private insertCss(svg: string, css: string[]): string {
+
+        if (css == null || css.length == 0) return svg;
+
+        let defsEndIndex = svg.toLowerCase().indexOf('</defs>');
+        if (defsEndIndex === -1) {
+            let svgEndIndex = svg.toLowerCase().indexOf('</svg>');
+            return svg.slice(0, svgEndIndex)
+                + `<defs>${this.loadCss(css)}</defs>`
+                + svg.slice(svgEndIndex, svg.length);
+        }
+        return svg.slice(0, defsEndIndex)
+            + this.loadCss(css)
+            + svg.slice(defsEndIndex, svg.length);
+    }
+    private loadCss(css: string[]): string {
+        let result = "";
+        css.forEach(x => {
+            result += `<style type="text/css"><![CDATA[${fs.readFileSync(this.getWorkspacePath(x))}]]></style>`;
+        });
+        return result;
     }
 
+    private stylesheetRegex: RegExp = /<\?\s*xml-stylesheet\s+.*href="(.+?)".*\s*\?>/gi;
     protected snippet(properties: string): string {
         let showTransGrid = vscode.workspace.getConfiguration('svgviewer').get('transparencygrid');
         let transparencycolor = vscode.workspace.getConfiguration('svgviewer').get('transparencycolor');
@@ -77,22 +95,18 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
 }
 </style>`;
             } else {
-                transparencyGridCss = `
-<style type="text/css">
-.svgbg img {
-    background:initial;
-    background-image: url(data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAeUlEQVRYR+3XMQ4AIQhEUTiU9+/hUGy9Wk2G8luDIS8EMWdmYvF09+JtEUmBpieCJiA96AIiiKAswEsik10JCCIoCrAsiGBPOIK2YFWt/knOOW5Nv/ykQNMTQRMwEERQFWAOqmJ3PIIIigIMahHs3ahZt0xCetAEjA99oc8dGNmnIAAAAABJRU5ErkJggg==);
-    background-position: left,top;
-    transform-origin: top left;
-}
-</style>`;
+                transparencyGridCss = `<link rel="stylesheet" href="${this.getPath('media/background.css')}" type="text/css"></style>`;
             }
         }
-        let defsEndIndex = properties.indexOf('</defs>');
+        let matches: RegExpExecArray;
+        let css: string[] = new Array();
+        while (matches = this.stylesheetRegex.exec(properties)) {
+            css.push(matches[1]);
+        }
         let html = `<!DOCTYPE html><html><head>${transparencyGridCss}
 <script src="${this.getPath('media/preview.js')}"></script>
 </script></head><body>
-        <div class="svgbg"><img id="svgimg" src="data:image/svg+xml,${encodeURIComponent(this.insertCss(properties,defsEndIndex,null))}"></div>
+        <div class="svgbg"><img id="svgimg" src="data:image/svg+xml,${encodeURIComponent(this.insertCss(properties, css))}"></div>
         </body></html>`;
         return html;
     }
