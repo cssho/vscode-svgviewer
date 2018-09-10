@@ -1,0 +1,9 @@
+# Changelog
+## 1.4.6 (2018-09-10)
+- [Support for external CSS missing](https://github.com/cssho/vscode-svgviewer/issues/41)
+
+## 1.4.5 (2018-09-06)
+- [Allow zooming of SVG with mouse wheel](https://github.com/cssho/vscode-svgviewer/issues/43)
+
+## 1.4.4 (2018-05-08)
+- [Bug: show Button when view extensions](https://github.com/cssho/vscode-svgviewer/issues/42)
