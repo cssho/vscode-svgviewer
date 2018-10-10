@@ -1,4 +1,7 @@
 # Changelog
+## 1.4.7 (2018-10-10)
+- [Buttons for zooming](https://github.com/cssho/vscode-svgviewer/issues/48)
+
 ## 1.4.6 (2018-09-10)
 - [Support for external CSS missing](https://github.com/cssho/vscode-svgviewer/issues/41)
 

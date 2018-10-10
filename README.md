@@ -55,6 +55,9 @@ The following Visual Studio Code setting is available for the SVG Viewer.  This 
     "svgviewer.previewcolumn": Two,
     
     // Color setting for transparency
-    "svgviewer.transparencycolor": "#2BD163"
+    "svgviewer.transparencycolor": "#2BD163",
+
+    // Show zoom in/out button in preview windows
+    "svgviewer.enableautopreview": true
 }
 ```

@@ -4,13 +4,14 @@ import * as vscode from 'vscode';
 import { SvgDocumentContentProvider, SvgFileContentProvider, getSvgUri } from './svgProvider';
 import { ExportDocumentContentProvider } from './exportProvider';
 
-const exec = require('sync-exec');
-const fs = require('pn/fs');
-const tmp = require('tmp');
-const cp = require('copy-paste');
-const svgexport = require('svgexport');
-const path = require('path');
-const phantomjs = require('phantomjs-prebuilt');
+import exec = require('sync-exec');
+import fs = require('pn/fs');
+import tmp = require('tmp');
+import cp = require('copy-paste');
+import svgexport = require('svgexport');
+import path = require('path');
+import phantomjs = require('phantomjs-prebuilt');
+
 export function activate(context: vscode.ExtensionContext) {
 
     // Check PhantomJS Binary

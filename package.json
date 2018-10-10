@@ -2,7 +2,7 @@
     "name": "vscode-svgviewer",
     "displayName": "SVG Viewer",
     "description": "SVG Viewer for Visual Studio Code.",
-    "version": "1.4.6",
+    "version": "1.4.7",
     "publisher": "cssho",
     "engines": {
         "vscode": "^1.12.0"
@@ -118,6 +118,11 @@
                     ],
                     "default": "Two",
                     "description": "How to open the screen (vscode.ViewColumn)"
+                },
+                "svgviewer.showzoominout": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Show zoom in/out button in preview windows"
                 }
             }
         }

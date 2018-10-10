@@ -80,6 +80,14 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
         return result;
     }
 
+    private buttonHtml(): string {
+        return vscode.workspace.getConfiguration('svgviewer').get('showzoominout') ?
+            `<div class="svgv-zoom-container">
+            <button class="svgv-btn" type="button" title="Zoom in" id="zoom_in">+</button>
+            <button class="svgv-btn" type="button" title="Zoom out" id="zoom_out">-</button>
+            </div>` : '';
+    }
+
     private stylesheetRegex: RegExp = /<\?\s*xml-stylesheet\s+.*href="(.+?)".*\s*\?>/gi;
     protected snippet(properties: string): string {
         let showTransGrid = vscode.workspace.getConfiguration('svgviewer').get('transparencygrid');
@@ -89,7 +97,7 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
             if (transparencycolor != null && transparencycolor !== "") {
                 transparencyGridCss = `
 <style type="text/css">
-.svgbg img {
+.svgv-bg img {
     background: `+ transparencycolor + `;
     transform-origin: top left;
 }
@@ -105,8 +113,10 @@ export class SvgDocumentContentProvider implements vscode.TextDocumentContentPro
         }
         let html = `<!DOCTYPE html><html><head>${transparencyGridCss}
 <script src="${this.getPath('media/preview.js')}"></script>
-</script></head><body>
-        <div class="svgbg"><img id="svgimg" src="data:image/svg+xml,${encodeURIComponent(this.insertCss(properties, css))}"></div>
+<link rel="stylesheet" href="${this.getPath('media/preview.css')}" type="text/css"></style>
+</head><body>
+        ${this.buttonHtml()}
+        <div class="svgv-bg"><img id="svgimg" src="data:image/svg+xml,${encodeURIComponent(this.insertCss(properties, css))}"></div>
         </body></html>`;
         return html;
     }

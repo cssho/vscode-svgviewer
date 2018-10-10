@@ -6,6 +6,8 @@ window.addEventListener("load", function () {
             else zoomIn();
         }
     }
+    document.getElementById("zoom_in").addEventListener('click', zoomIn);
+    document.getElementById("zoom_out").addEventListener('click', zoomOut);
 }, false);
 
 function zoomIn() {
