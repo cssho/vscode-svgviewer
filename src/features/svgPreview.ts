@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { NewSvgDocumentContentProvider } from '../svgProvider';
+import { SvgDocumentContentProvider } from '../svgProvider';
 import { checkNoSvg } from '../extension';
 
 export class SvgPreview {
@@ -17,7 +17,7 @@ export class SvgPreview {
     public static async revive(
         webview: vscode.WebviewPanel,
         state: any,
-        contentProvider: NewSvgDocumentContentProvider
+        contentProvider: SvgDocumentContentProvider
     ): Promise<SvgPreview> {
         const resource = vscode.Uri.parse(state.resource);
 
@@ -35,13 +35,15 @@ export class SvgPreview {
     public static create(
         resource: vscode.Uri,
         previewColumn: vscode.ViewColumn,
-        contentProvider: NewSvgDocumentContentProvider
+        contentProvider: SvgDocumentContentProvider,
+        context: vscode.ExtensionContext
     ): SvgPreview {
         const webview = vscode.window.createWebviewPanel(
             SvgPreview.viewType,
             SvgPreview.getPreviewTitle(resource),
             previewColumn, {
-                enableFindWidget: true
+                enableFindWidget: true,
+                localResourceRoots: [vscode.Uri.file(path.join(context.extensionPath, 'media'))]
             });
 
         return new SvgPreview(
@@ -53,7 +55,7 @@ export class SvgPreview {
     private constructor(
         webview: vscode.WebviewPanel,
         resource: vscode.Uri,
-        private readonly contentProvider: NewSvgDocumentContentProvider,
+        private readonly contentProvider: SvgDocumentContentProvider,
     ) {
         this._resource = resource;
         this.editor = webview;

@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { NewSvgDocumentContentProvider } from '../svgProvider';
+import { SvgDocumentContentProvider } from '../svgProvider';
 import { SvgPreview, PreviewSettings } from './svgPreview';
 
 export class SvgPreviewWebviewManager implements vscode.WebviewPanelSerializer {
@@ -9,7 +9,8 @@ export class SvgPreviewWebviewManager implements vscode.WebviewPanelSerializer {
     private readonly disposables: vscode.Disposable[] = [];
 
     public constructor(
-        private readonly contentProvider: NewSvgDocumentContentProvider
+        private readonly contentProvider: SvgDocumentContentProvider,
+        private readonly context: vscode.ExtensionContext
     ) {
         this.disposables.push(vscode.window.registerWebviewPanelSerializer(SvgPreview.viewType, this));
     }
@@ -81,7 +82,7 @@ export class SvgPreviewWebviewManager implements vscode.WebviewPanelSerializer {
         const preview = SvgPreview.create(
             resource,
             previewSettings.previewColumn,
-            this.contentProvider);
+            this.contentProvider, this.context);
 
         this.setPreviewActiveContext(true);
         this.activePreview = preview;

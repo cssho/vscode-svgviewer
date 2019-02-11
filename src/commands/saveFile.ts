@@ -4,16 +4,11 @@ import { checkNoSvg } from '../extension';
 import tmp = require('tmp');
 import svgexport = require('svgexport');
 import fs = require('pn/fs');
+import cp = require('copy-paste');
 
 async function saveFileAs(uri: vscode.Uri) {
     let resource = uri;
-    if (!(resource instanceof vscode.Uri)) {
-        if (vscode.window.activeTextEditor) {
-            resource = vscode.window.activeTextEditor.document.uri;
-        }
-        if (!(resource instanceof vscode.Uri)) return;
-    }
-    const textDocument = await vscode.workspace.openTextDocument(resource);
+    const textDocument = await loadTextDocument(resource);
     if (checkNoSvg(textDocument)) return;
     const text = textDocument.getText();
     const tmpobj = tmp.fileSync({ 'postfix': '.svg' });
@@ -23,13 +18,7 @@ async function saveFileAs(uri: vscode.Uri) {
 
 async function saveFileAsSize(uri: vscode.Uri) {
     let resource = uri;
-    if (!(resource instanceof vscode.Uri)) {
-        if (vscode.window.activeTextEditor) {
-            resource = vscode.window.activeTextEditor.document.uri;
-        }
-        if (!(resource instanceof vscode.Uri)) return;
-    }
-    const textDocument = await vscode.workspace.openTextDocument(resource);
+    const textDocument = await loadTextDocument(resource);
     if (checkNoSvg(textDocument)) return;
     const text = textDocument.getText();
     const tmpobj = tmp.fileSync({ 'postfix': '.svg' });
@@ -45,6 +34,24 @@ async function saveFileAsSize(uri: vscode.Uri) {
                     });
             }
         });
+}
+
+async function loadTextDocument(resource: vscode.Uri): Promise<vscode.TextDocument> {
+    if (!(resource instanceof vscode.Uri)) {
+        if (vscode.window.activeTextEditor) {
+            resource = vscode.window.activeTextEditor.document.uri;
+        }
+        if (!(resource instanceof vscode.Uri)) return null;
+    }
+    return await vscode.workspace.openTextDocument(resource);
+}
+
+async function copyDataUri(uri: vscode.Uri) {
+    let resource = uri;
+    const textDocument = await loadTextDocument(resource);
+    if (checkNoSvg(textDocument)) return;
+    const text = textDocument.getText();
+    cp.copy('data:image/svg+xml,' + encodeURIComponent(text));
 }
 
 export class SaveAsCommand implements Command {
@@ -69,6 +76,17 @@ export class SaveAsSizeCommand implements Command {
         for (const uri of Array.isArray(allUris) ? allUris : [mainUri]) {
             saveFileAsSize(uri);
         }
+    }
+}
+
+export class CopyDataUriCommand implements Command {
+    public readonly id = 'svgviewer.copydui';
+
+    public constructor(
+    ) { }
+
+    public execute(mainUri?: vscode.Uri, allUris?: vscode.Uri[]) {
+        copyDataUri(mainUri);
     }
 }
 
