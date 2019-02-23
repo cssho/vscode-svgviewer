@@ -1,4 +1,11 @@
 const regexp = /scale\(([0-9\.]+)\)/g;
+
+const vscode = acquireVsCodeApi();
+
+// Set VS Code state
+let state = JSON.parse(document.getElementById('vscode-markdown-preview-data').getAttribute('data-state'));
+vscode.setState(state);
+
 window.addEventListener("load", function () {
     document.onwheel = function (event) {
         if (event.ctrlKey) {
@@ -8,6 +15,7 @@ window.addEventListener("load", function () {
     }
     document.getElementById("zoom_in").addEventListener('click', zoomIn);
     document.getElementById("zoom_out").addEventListener('click', zoomOut);
+    svgimg.style.transform = 'scale(' + state.zoom + ')';
 }, false);
 
 function zoomIn() {
@@ -15,6 +23,8 @@ function zoomIn() {
     var zoomFloat = currentZoomValue(svgimg);
     zoomFloat += zoomFloat * 0.1;
     svgimg.style.transform = 'scale(' + zoomFloat + ')';
+    state.zoom = zoomFloatp;
+    vscode.setState(state);
 }
 
 function zoomOut() {
@@ -23,6 +33,8 @@ function zoomOut() {
     zoomFloat -= zoomFloat * 0.1;
     if (zoomFloat < 0.1) return;
     svgimg.style.transform = 'scale(' + zoomFloat + ')';
+    state.zoom = zoomFloatp;
+    vscode.setState(state);
 };
 
 function currentZoomValue(svgimg) {

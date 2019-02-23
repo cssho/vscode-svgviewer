@@ -3,24 +3,13 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import fs = require('fs');
+import { Configuration } from './configuration';
 
-export function getSvgUri(uri: vscode.Uri) {
-    if (uri.scheme === 'svg-preview') {
-        return uri;
-    }
+export class SvgDocumentContentProvider implements vscode.TextDocumentContentProvider {
 
-    return uri.with({
-        scheme: 'svg-preview',
-        path: uri.path + '.rendered',
-        query: uri.toString()
-    });
-}
-
-export class SvgDocumentContentProvider {
-
-    private snippet(properties: string): string {
-        let showTransGrid = vscode.workspace.getConfiguration('svgviewer').get('transparencygrid');
-        let transparencycolor = vscode.workspace.getConfiguration('svgviewer').get('transparencycolor');
+    private snippet(properties: string, state: any): string {
+        const showTransGrid = Configuration.showTransGrid();
+        const transparencycolor = Configuration.transparencyColor();
         let transparencyGridCss = '';
         if (showTransGrid) {
             if (transparencycolor != null && transparencycolor !== "") {
@@ -40,7 +29,9 @@ export class SvgDocumentContentProvider {
         while (matches = SvgDocumentContentProvider.stylesheetRegex.exec(properties)) {
             css.push(matches[1]);
         }
-        let html = `<!DOCTYPE html><html><head>${transparencyGridCss}
+        let html = `<!DOCTYPE html><html><head>
+<meta id="vscode-svg-preview-data" data-state="${JSON.stringify(state || {}).replace(/"/g, '&quot;')}">
+${transparencyGridCss}
 <script src="${this.getPath('media/preview.js')}"></script>
 <link rel="stylesheet" href="${this.getPath('media/preview.css')}" type="text/css"></style>
 </head><body>
@@ -49,10 +40,10 @@ export class SvgDocumentContentProvider {
         </body></html>`;
         return html;
     }
-    public async provideTextDocumentContent(sourceUri: vscode.Uri): Promise<string> {
+    public async provideTextDocumentContent(sourceUri: vscode.Uri, state: any): Promise<string> {
         const document = await vscode.workspace.openTextDocument(sourceUri);
         this.resourceDir = path.dirname(sourceUri.fsPath);
-        return this.snippet(document.getText());
+        return this.snippet(document.getText(), state);
     }
 
     private getPath(file: string): vscode.Uri {
@@ -62,6 +53,10 @@ export class SvgDocumentContentProvider {
         return onDiskPath.with({ scheme: 'vscode-resource' });
     }
     public constructor(protected context: vscode.ExtensionContext) { }
+
+    get localResourceRoot(): vscode.Uri {
+        return vscode.Uri.file(path.join(this.context.extensionPath, 'media'));
+    }
 
     private buttonHtml(): string {
         return vscode.workspace.getConfiguration('svgviewer').get('showzoominout') ?
@@ -102,4 +97,19 @@ export class SvgDocumentContentProvider {
     private resourceDir: string;
 
     private static readonly stylesheetRegex: RegExp = /<\?\s*xml-stylesheet\s+.*href="(.+?)".*\s*\?>/gi;
+
+    private static readonly svgRegexp = /<svg .*<\/svg>/s;
+    private static readonly noSvgErrorNessage = `Active editor doesn't show a SVG document - no properties to preview.`;
+    public static checkNoSvg(document: vscode.TextDocument, displayMessage: boolean = true) {
+        if (!document) {
+            vscode.window.showWarningMessage(SvgDocumentContentProvider.noSvgErrorNessage);
+            return true;
+        }
+        let isSvg = document.getText().match(SvgDocumentContentProvider.svgRegexp);
+        if (!isSvg && displayMessage) {
+            vscode.window.showWarningMessage(SvgDocumentContentProvider.noSvgErrorNessage);
+        }
+        return !isSvg;
+    }
+
 }

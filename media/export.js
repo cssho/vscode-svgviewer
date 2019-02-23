@@ -26,13 +26,10 @@ $(() => {
             sw,
             sh
         );
-        let du = $canvas[0].toDataURL('image/png');
-        let args = {
-            du: du,
+        vscode.postMessage({
+            du: $canvas[0].toDataURL('image/png'),
             output: decodeURIComponent($exprt.data('output'))
-        };
-        $exprt.attr({href: 'command:svgviewer.savedu?'
-            + encodeURIComponent(JSON.stringify(args))});
+        })
     }
 
     function handler($elem) {

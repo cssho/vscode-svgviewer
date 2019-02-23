@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 
 import { Command } from '../commandManager';
-import { SvgPreviewWebviewManager } from '../features/svgPreviewWebviewManager';
-import { getViewColumn } from '../configuration';
-import { checkNoSvg } from '../extension';
+import { SvgWebviewManager } from '../features/svgWebviewManager';
+import { Configuration } from '../configuration';
+import { SvgDocumentContentProvider } from '../svgProvider';
 
 async function showPreview(
-    webviewManager: SvgPreviewWebviewManager,
+    webviewManager: SvgWebviewManager,
     uri: vscode.Uri
 ) {
     let resource = uri;
@@ -17,19 +17,19 @@ async function showPreview(
         if (!(resource instanceof vscode.Uri)) return;
     }
     const textDocument = await vscode.workspace.openTextDocument(resource);
-    if (checkNoSvg(textDocument)) return;
+    if (SvgDocumentContentProvider.checkNoSvg(textDocument)) return;
     const resourceColumn = (vscode.window.activeTextEditor && vscode.window.activeTextEditor.viewColumn) || vscode.ViewColumn.One;
-    webviewManager.preview(resource, {
+    webviewManager.view(resource, {
         resourceColumn: resourceColumn,
-        previewColumn: getViewColumn()
-    })
+        viewColumn: Configuration.getViewColumn()
+    });
 }
 
 export class ShowPreviewCommand implements Command {
     public readonly id = 'svgviewer.open';
 
     public constructor(
-        private readonly webviewManager: SvgPreviewWebviewManager
+        private readonly webviewManager: SvgWebviewManager
     ) { }
 
     public execute(mainUri?: vscode.Uri, allUris?: vscode.Uri[]) {

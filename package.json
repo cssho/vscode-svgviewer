@@ -18,12 +18,11 @@
         "onCommand:svgviewer.saveassize",
         "onCommand:svgviewer.copydui",
         "onCommand:svgviewer.openexport",
-        "*"
+        "onWebviewPanel:svg.preview"
     ],
     "main": "./out/src/extension",
     "contributes": {
-        "commands": [
-            {
+        "commands": [{
                 "command": "svgviewer.open",
                 "title": "SVG Viewer: View SVG",
                 "icon": {
@@ -49,15 +48,12 @@
             }
         ],
         "menus": {
-            "editor/title": [
-                {
-                    "when": "editorLangId == xml",
-                    "command": "svgviewer.open",
-                    "group": "navigation"
-                }
-            ],
-            "explorer/context": [
-                {
+            "editor/title": [{
+                "when": "editorLangId == xml",
+                "command": "svgviewer.open",
+                "group": "navigation"
+            }],
+            "explorer/context": [{
                     "command": "svgviewer.open",
                     "group": "extension",
                     "when": "resourceLangId  == xml"
@@ -74,8 +70,7 @@
                 }
             ]
         },
-        "keybindings": [
-            {
+        "keybindings": [{
                 "command": "svgviewer.open",
                 "key": "alt+shift+s o"
             },
@@ -118,11 +113,19 @@
                 "svgviewer.previewcolumn": {
                     "type": "string",
                     "enum": [
+                        "Active",
+                        "Beside",
                         "One",
                         "Two",
-                        "Three"
+                        "Three",
+                        "Four",
+                        "Five",
+                        "Six",
+                        "Seven",
+                        "Eight",
+                        "Nine"
                     ],
-                    "default": "Two",
+                    "default": "Beside",
                     "description": "How to open the screen (vscode.ViewColumn)"
                 },
                 "svgviewer.showzoominout": {

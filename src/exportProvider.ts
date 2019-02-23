@@ -6,11 +6,12 @@ import * as path from 'path';
 export class ExportDocumentContentProvider implements vscode.TextDocumentContentProvider {
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
 
-    public constructor(private _context: vscode.ExtensionContext) {}
+    public constructor(private context: vscode.ExtensionContext) {}
 
-    public provideTextDocumentContent(uri: vscode.Uri): Thenable<string> {
+    public async provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
         let docUri = vscode.Uri.parse(uri.query);
-        return vscode.workspace.openTextDocument(docUri).then(document => this.snippet(document));
+        const document = await vscode.workspace.openTextDocument(docUri);
+        return this.snippet(document);
     }
 
     get onDidChange(): vscode.Event<vscode.Uri> {
@@ -21,8 +22,11 @@ export class ExportDocumentContentProvider implements vscode.TextDocumentContent
         this._onDidChange.fire(uri);
     }
 
-    private getPath(p: string): string {
-        return path.join(this._context.extensionPath, p);
+    private getPath(file: string): vscode.Uri {
+        const onDiskPath = vscode.Uri.file(
+            path.join(this.context.extensionPath, file)
+        );
+        return onDiskPath.with({ scheme: 'vscode-resource' });
     }
 
     private snippet(document: vscode.TextDocument): string {
@@ -39,5 +43,9 @@ export class ExportDocumentContentProvider implements vscode.TextDocumentContent
         let height = `<div class="wrapper"><label for="height" class="label-name">Height</label><input id="height" type="number" placeholder="height"><label for="height"> px</label></div>`;
         let options = `<h1>Options</h1><div class="form">${width}${height}${exportButton}</div>`;
         return `<!DOCTYPE html><html><head>${css}${jquery}${exportjs}</head><body>${options}<h1>Preview</h1><div>${svg}${image}${canvas}</div></body></html>`;
+    }
+
+    get localResourceRoot(): vscode.Uri {
+        return vscode.Uri.file(path.join(this.context.extensionPath, 'media'));
     }
 }

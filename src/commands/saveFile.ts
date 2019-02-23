@@ -1,15 +1,15 @@
 import * as vscode from 'vscode';
 import { Command } from '../commandManager';
-import { checkNoSvg } from '../extension';
 import tmp = require('tmp');
 import svgexport = require('svgexport');
 import fs = require('pn/fs');
 import cp = require('copy-paste');
+import { SvgDocumentContentProvider } from '../svgProvider';
 
 async function saveFileAs(uri: vscode.Uri) {
     let resource = uri;
     const textDocument = await loadTextDocument(resource);
-    if (checkNoSvg(textDocument)) return;
+    if (SvgDocumentContentProvider.checkNoSvg(textDocument)) return;
     const text = textDocument.getText();
     const tmpobj = tmp.fileSync({ 'postfix': '.svg' });
     const pngpath = resource.fsPath.replace('.svg', '.png');
@@ -19,7 +19,7 @@ async function saveFileAs(uri: vscode.Uri) {
 async function saveFileAsSize(uri: vscode.Uri) {
     let resource = uri;
     const textDocument = await loadTextDocument(resource);
-    if (checkNoSvg(textDocument)) return;
+    if (SvgDocumentContentProvider.checkNoSvg(textDocument)) return;
     const text = textDocument.getText();
     const tmpobj = tmp.fileSync({ 'postfix': '.svg' });
     const pngpath = resource.fsPath.replace('.svg', '.png');
@@ -49,7 +49,7 @@ async function loadTextDocument(resource: vscode.Uri): Promise<vscode.TextDocume
 async function copyDataUri(uri: vscode.Uri) {
     let resource = uri;
     const textDocument = await loadTextDocument(resource);
-    if (checkNoSvg(textDocument)) return;
+    if (SvgDocumentContentProvider.checkNoSvg(textDocument)) return;
     const text = textDocument.getText();
     cp.copy('data:image/svg+xml,' + encodeURIComponent(text));
 }
@@ -89,6 +89,7 @@ export class CopyDataUriCommand implements Command {
         copyDataUri(mainUri);
     }
 }
+
 
 function exportPng(tmpobj: any, text: string, pngpath: string, w?: number, h?: number) {
     console.log(`export width:${w} height:${h}`);
