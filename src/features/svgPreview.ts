@@ -1,46 +1,31 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { SvgDocumentContentProvider } from '../svgProvider';
-import fs = require('pn/fs');
-import { stat } from 'fs';
+import { SvgDocumentContentProvider, BaseContentProvider } from '../svgProvider';
+import { isNumber } from 'util';
 
-export class SvgPreview {
-    private _resource: vscode.Uri;
-    private _zoom: number;
+export abstract class SvgView {
 
+    protected _resource: vscode.Uri;
     protected readonly editor: vscode.WebviewPanel;
-    private throttleTimer: any;
+
+    protected throttleTimer: any;
     private firstUpdate = true;
     private disposed: boolean = false;
     protected disposables: vscode.Disposable[] = [];
-
-    protected constructor(
-        webview: vscode.WebviewPanel,
-        resource: vscode.Uri,
-        zoom: number,
-        protected readonly contentProvider: SvgDocumentContentProvider
-    ) {
+    protected constructor(webview: vscode.WebviewPanel,
+        resource: vscode.Uri) {
         this._resource = resource;
-        this._zoom = zoom
         this.editor = webview;
 
         this.editor.onDidDispose(() => {
             this.dispose();
         }, null, this.disposables);
-
         vscode.workspace.onDidChangeTextDocument(event => {
-            if (this.isPreviewOf(event.document.uri)) {
+            if (this.isViewOf(event.document.uri)) {
                 this.refresh();
             }
         }, null, this.disposables);
-
-        vscode.window.onDidChangeActiveTextEditor(editor => {
-            if (editor && !SvgDocumentContentProvider.checkNoSvg(editor.document)) {
-                this.update(editor.document.uri);
-            }
-        }, null, this.disposables);
     }
-
     public dispose() {
         if (this.disposed) {
             return;
@@ -60,29 +45,18 @@ export class SvgPreview {
         this.editor.dispose();
     }
 
-
-
     private readonly onDisposeEmitter = new vscode.EventEmitter<void>();
     public readonly onDispose = this.onDisposeEmitter.event;
 
     private readonly onDidChangeViewStateEmitter = new vscode.EventEmitter<vscode.WebviewPanelOnDidChangeViewStateEvent>();
     public readonly onDidChangeViewState = this.onDidChangeViewStateEmitter.event;
 
+    
     public get resource(): vscode.Uri {
         return this._resource;
     }
 
-    public get zoom(): number {
-        return this._zoom;
-    }
-
-    public get state() {
-        return {
-            resource: this.resource.toString(),
-            zoom: this.zoom
-        };
-    }
-
+    
     public update(resource: vscode.Uri) {
         const isResourceChange = resource.fsPath !== this._resource.fsPath;
         if (isResourceChange) {
@@ -103,6 +77,7 @@ export class SvgPreview {
         this.firstUpdate = false;
     }
 
+    
     public refresh() {
         this.update(this._resource);
     }
@@ -114,7 +89,7 @@ export class SvgPreview {
     public matchesResource(
         otherResource: vscode.Uri
     ): boolean {
-        return this.isPreviewOf(otherResource);
+        return this.isViewOf(otherResource);
     }
 
     public matches(otherView: SvgPreview): boolean {
@@ -125,8 +100,44 @@ export class SvgPreview {
         this.editor.reveal(viewColumn);
     }
 
-    private isPreviewOf(resource: vscode.Uri): boolean {
+    private isViewOf(resource: vscode.Uri): boolean {
         return this._resource.fsPath === resource.fsPath;
+    }
+
+    protected abstract async doUpdate(): Promise<void>;
+
+    protected static getWebviewOptions(contentProvider: BaseContentProvider
+    ): vscode.WebviewOptions {
+        return {
+            enableScripts: true,
+            localResourceRoots: [contentProvider.localResourceRoot]
+        };
+    }
+    abstract get state();
+
+}
+export class SvgPreview extends SvgView {
+    private _zoom: number;
+
+    protected constructor(
+        webview: vscode.WebviewPanel,
+        resource: vscode.Uri,
+        zoom: number,
+        private readonly contentProvider: SvgDocumentContentProvider
+    ) {
+        super(webview, resource);
+        this._zoom = zoom
+    }
+
+    public get zoom(): number {
+        return this._zoom;
+    }
+
+    get state() {
+        return {
+            resource: this.resource.toString(),
+            zoom: this.zoom
+        };
     }
 
     protected async doUpdate(): Promise<void> {
@@ -139,21 +150,13 @@ export class SvgPreview {
 
         const content = await this.contentProvider.provideTextDocumentContent(document.uri, this.state);
         if (this._resource === resource) {
-            this.editor.title = SvgPreview.getPreviewTitle(this._resource);
+            this.editor.title = SvgPreview.viewTitle(this._resource);
             this.editor.webview.options = SvgPreview.getWebviewOptions(this.contentProvider);
             this.editor.webview.html = content;
         }
     }
 
-    protected static getWebviewOptions(contentProvider: SvgDocumentContentProvider
-    ): vscode.WebviewOptions {
-        return {
-            enableScripts: true,
-            localResourceRoots: [contentProvider.localResourceRoot]
-        };
-    }
-
-    protected static getPreviewTitle(resource: vscode.Uri): string {
+    protected static viewTitle(resource: vscode.Uri): string {
         return `Preview ${path.basename(resource.fsPath)}`;
     }
 
@@ -163,7 +166,7 @@ export class SvgPreview {
         contentProvider: SvgDocumentContentProvider
     ): Promise<SvgPreview> {
         const resource = vscode.Uri.parse(state.resource);
-        const zoom: number = state.zoom instanceof Number ? state.zoom : 1.0;
+        const zoom: number = isNumber(state.zoom) ? state.zoom : 1.0;
 
         const preview = new SvgPreview(
             webview,
@@ -171,7 +174,7 @@ export class SvgPreview {
             zoom,
             contentProvider);
 
-        preview.editor.webview.options = SvgPreview.getWebviewOptions(contentProvider);
+        preview.editor.webview.options = SvgView.getWebviewOptions(contentProvider);
 
         await preview.doUpdate();
         return preview;
@@ -186,7 +189,7 @@ export class SvgPreview {
     ): SvgPreview {
         const webview = vscode.window.createWebviewPanel(
             SvgPreview.viewType,
-            SvgPreview.getPreviewTitle(resource),
+            SvgPreview.viewTitle(resource),
             previewColumn, {
                 enableFindWidget: true,
                 localResourceRoots: [contentProvider.localResourceRoot]

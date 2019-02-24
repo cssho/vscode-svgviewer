@@ -1,16 +1,19 @@
 import * as vscode from 'vscode';
 import { SvgDocumentContentProvider } from '../svgProvider';
-import { SvgPreview, ViewSettings } from './svgPreview';
+import { SvgPreview, ViewSettings, SvgView } from './svgPreview';
+import { SvgExport } from './svgExport';
+import { ExportDocumentContentProvider } from '../exportProvider';
 
-export class SvgWebviewManager implements vscode.WebviewPanelSerializer {
-    private readonly views: SvgPreview[] = [];
+abstract class WebviewManager implements vscode.WebviewPanelSerializer {
+    protected abstract readonly views: SvgView[];
+    abstract deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any);
 
-    private readonly disposables: vscode.Disposable[] = [];
+    protected readonly disposables: vscode.Disposable[] = [];
 
-    public constructor(
-        private readonly contentProvider: SvgDocumentContentProvider
-    ) {
-        this.disposables.push(vscode.window.registerWebviewPanelSerializer(SvgPreview.viewType, this));
+    public refresh() {
+        for (const preview of this.views) {
+            preview.refresh();
+        }
     }
 
     public dispose(): void {
@@ -27,13 +30,15 @@ export class SvgWebviewManager implements vscode.WebviewPanelSerializer {
             }
         }
     }
-
-    public refresh() {
-        for (const preview of this.views) {
-            preview.refresh();
-        }
+}
+export class SvgWebviewManager extends WebviewManager {
+    protected readonly views: SvgPreview[] = [];
+    public constructor(
+        protected readonly contentProvider: SvgDocumentContentProvider
+    ) {
+        super();
+        this.disposables.push(vscode.window.registerWebviewPanelSerializer(SvgPreview.viewType, this));
     }
-
 
     public view(
         resource: vscode.Uri,
@@ -43,7 +48,7 @@ export class SvgWebviewManager implements vscode.WebviewPanelSerializer {
         if (view) {
             view.reveal(viewSettings.viewColumn);
         } else {
-            view = this.createPreview(resource, viewSettings);
+            view = this.createView(resource, viewSettings);
         }
 
         view.update(resource);
@@ -59,7 +64,7 @@ export class SvgWebviewManager implements vscode.WebviewPanelSerializer {
             state,
             this.contentProvider);
 
-        this.registerPreview(preview);
+        this.registerView(preview);
     }
 
     private getExistingView(
@@ -69,7 +74,7 @@ export class SvgWebviewManager implements vscode.WebviewPanelSerializer {
             preview.matchesResource(resource));
     }
 
-    private createPreview(
+    private createView(
         resource: vscode.Uri,
         previewSettings: ViewSettings
     ): SvgPreview {
@@ -78,11 +83,11 @@ export class SvgWebviewManager implements vscode.WebviewPanelSerializer {
             previewSettings.viewColumn,
             this.contentProvider);
 
-        this.setPreviewActiveContext(true);
-        return this.registerPreview(preview);
+        this.setViewActiveContext(true);
+        return this.registerView(preview);
     }
 
-    private registerPreview(
+    private registerView(
         preview: SvgPreview
     ): SvgPreview {
         this.views.push(preview);
@@ -99,9 +104,88 @@ export class SvgWebviewManager implements vscode.WebviewPanelSerializer {
         return preview;
     }
 
-    private setPreviewActiveContext(value: boolean) {
-        vscode.commands.executeCommand('setContext', SvgWebviewManager.svgPreviewActiveContextKey, value);
+    private setViewActiveContext(value: boolean) {
+        vscode.commands.executeCommand('setContext', SvgWebviewManager.svgActiveContextKey, value);
     }
 
-    private static readonly svgPreviewActiveContextKey = 'svgPreviewFocus';
+    protected static readonly svgActiveContextKey: string = 'svgPreviewFocus';
+}
+
+export class SvgExportWebviewManager extends WebviewManager {
+    protected readonly views: SvgExport[] = [];
+    public constructor(
+        protected readonly contentProvider: ExportDocumentContentProvider
+    ) {
+        super();
+        this.disposables.push(vscode.window.registerWebviewPanelSerializer(SvgExport.viewType, this));
+    }
+
+    public async deserializeWebviewPanel(
+        webview: vscode.WebviewPanel,
+        state: any
+    ): Promise<void> {
+        const exp = await SvgExport.revive(
+            webview,
+            state,
+            this.contentProvider);
+
+        this.registerView(exp);
+    }
+
+    public view(
+        resource: vscode.Uri,
+        viewSettings: ViewSettings
+    ): void {
+        let view = this.getExistingView(resource);
+        if (view) {
+            view.reveal(viewSettings.viewColumn);
+        } else {
+            view = this.createView(resource, viewSettings);
+        }
+
+        view.update(resource);
+    }
+
+    private getExistingView(
+        resource: vscode.Uri
+    ): SvgExport | undefined {
+        return this.views.find(preview =>
+            preview.matchesResource(resource));
+    }
+
+    private registerView(
+        preview: SvgExport
+    ): SvgExport {
+        this.views.push(preview);
+
+        preview.onDispose(() => {
+            const existing = this.views.indexOf(preview);
+            if (existing === -1) {
+                return;
+            }
+
+            this.views.splice(existing, 1);
+        });
+
+        return preview;
+    }
+
+    private createView(
+        resource: vscode.Uri,
+        previewSettings: ViewSettings
+    ): SvgExport {
+        const preview = SvgExport.create(
+            resource,
+            previewSettings.viewColumn,
+            this.contentProvider);
+
+        this.setViewActiveContext(true);
+        return this.registerView(preview);
+    }
+
+    private setViewActiveContext(value: boolean) {
+        vscode.commands.executeCommand('setContext', SvgExportWebviewManager.svgActiveContextKey, value);
+    }
+
+    protected static readonly svgActiveContextKey: string = 'svgExportFocus';
 }

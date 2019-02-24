@@ -9,15 +9,19 @@ import exec = require('sync-exec');
 import fs = require('pn/fs');
 import path = require('path');
 import phantomjs = require('phantomjs-prebuilt');
-import { SvgWebviewManager } from './features/svgWebviewManager';
+import { SvgWebviewManager, SvgExportWebviewManager } from './features/svgWebviewManager';
 import { SaveAsCommand, SaveAsSizeCommand, CopyDataUriCommand } from './commands/saveFile';
+import { ExportDocumentContentProvider } from './exportProvider';
 
 export function activate(context: vscode.ExtensionContext) {
 
 
-    const newProvider = new SvgDocumentContentProvider(context);
-    const webviewManager = new SvgWebviewManager(newProvider);
+    const previewProvider = new SvgDocumentContentProvider(context);
+    const webviewManager = new SvgWebviewManager(previewProvider);
     context.subscriptions.push(webviewManager);
+    const exportProvider = new ExportDocumentContentProvider(context);
+    const expWebviewManager = new SvgExportWebviewManager(exportProvider);
+    context.subscriptions.push(expWebviewManager);
     const commandManager = new CommandManager();
     commandManager.register(new ShowPreviewCommand(webviewManager));
     commandManager.register(new SaveAsCommand());

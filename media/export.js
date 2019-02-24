@@ -1,4 +1,9 @@
 $(() => {
+    const vscode = acquireVsCodeApi();
+
+    // Set VS Code state
+    let state = JSON.parse(document.getElementById('vscode-svg-preview-data').getAttribute('data-state'));
+    vscode.setState(state);
     let $exprt = $('#export');
     let $canvas = $('#canvas');
     let $image = $('#image');
@@ -12,8 +17,12 @@ $(() => {
     update();
 
     function update() {
-        let ew = parseInt($width.val(), 10), eh = parseInt($height.val(), 10);
-        $canvas.attr({width: ew, height: eh});
+        let ew = parseInt($width.val(), 10),
+            eh = parseInt($height.val(), 10);
+        $canvas.attr({
+            width: ew,
+            height: eh
+        });
         let context = $canvas[0].getContext('2d');
         context.clearRect(0, 0, ew, eh);
         let scale = Math.min(ew / $svg.width(), eh / $svg.height());
@@ -27,8 +36,12 @@ $(() => {
             sh
         );
         vscode.postMessage({
-            du: $canvas[0].toDataURL('image/png'),
-            output: decodeURIComponent($exprt.data('output'))
+            command: 'exportData',
+            body: {
+                dataUrl: $canvas[0].toDataURL('image/png'),
+                output: decodeURIComponent($exprt.data('output')),
+                resource: state.resource
+            }
         })
     }
 
@@ -37,7 +50,9 @@ $(() => {
             if (parseInt($elem.val(), 10) > 0) {
                 return update();
             }
-            $exprt.attr({href: '#'});
+            $exprt.attr({
+                href: '#'
+            });
         }
     }
 });
