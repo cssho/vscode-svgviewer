@@ -12,6 +12,7 @@ import phantomjs = require('phantomjs-prebuilt');
 import { SvgWebviewManager, SvgExportWebviewManager } from './features/svgWebviewManager';
 import { SaveAsCommand, SaveAsSizeCommand, CopyDataUriCommand } from './commands/saveFile';
 import { ExportDocumentContentProvider } from './exportProvider';
+import { ShowExportCommand } from './commands/exportByCanvas';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -24,6 +25,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(expWebviewManager);
     const commandManager = new CommandManager();
     commandManager.register(new ShowPreviewCommand(webviewManager));
+    commandManager.register(new ShowExportCommand(expWebviewManager));
     commandManager.register(new SaveAsCommand());
     commandManager.register(new SaveAsSizeCommand());
     commandManager.register(new CopyDataUriCommand());

@@ -110,7 +110,7 @@ export abstract class SvgView {
     ): vscode.WebviewOptions {
         return {
             enableScripts: true,
-            localResourceRoots: [contentProvider.localResourceRoot]
+            localResourceRoots: contentProvider.localResourceRoots
         };
     }
     abstract get state();
@@ -192,7 +192,7 @@ export class SvgPreview extends SvgView {
             SvgPreview.viewTitle(resource),
             previewColumn, {
                 enableFindWidget: true,
-                localResourceRoots: [contentProvider.localResourceRoot]
+                localResourceRoots: contentProvider.localResourceRoots
             });
 
         return new SvgPreview(

@@ -13,12 +13,12 @@
     "activationEvents": [
         "onLanguage:xml",
         "onCommand:svgviewer.open",
-        "onCommand:svgviewer.openfile",
         "onCommand:svgviewer.saveas",
         "onCommand:svgviewer.saveassize",
         "onCommand:svgviewer.copydui",
         "onCommand:svgviewer.openexport",
-        "onWebviewPanel:svg.preview"
+        "onWebviewPanel:svg.preview",
+        "onWebviewPanel:svg.export"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -65,6 +65,11 @@
                 },
                 {
                     "command": "svgviewer.copydui",
+                    "group": "extension",
+                    "when": "resourceLangId  == xml"
+                },
+                {
+                    "command": "svgviewer.openexport",
                     "group": "extension",
                     "when": "resourceLangId  == xml"
                 }

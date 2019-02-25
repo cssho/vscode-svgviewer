@@ -8,8 +8,7 @@ export class ExportDocumentContentProvider extends BaseContentProvider {
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
 
     public async provideTextDocumentContent(uri: vscode.Uri, state: any): Promise<string> {
-        let docUri = vscode.Uri.parse(uri.query);
-        const document = await vscode.workspace.openTextDocument(docUri);
+        const document = await vscode.workspace.openTextDocument(uri);
         return this.snippet(document, state);
     }
 
@@ -20,7 +19,7 @@ export class ExportDocumentContentProvider extends BaseContentProvider {
     public update(uri: vscode.Uri) {
         this._onDidChange.fire(uri);
     }
-    
+
     private snippet(document: vscode.TextDocument, state: any): string {
         let showTransGrid = vscode.workspace.getConfiguration('svgviewer').get('transparencygrid');
         let css = `<link rel="stylesheet" type="text/css" href="${this.getPath('media/export.css')}">`;
@@ -38,7 +37,8 @@ export class ExportDocumentContentProvider extends BaseContentProvider {
         return `<!DOCTYPE html><html><head>${stateMeta}${css}${jquery}${exportjs}</head><body>${options}<h1>Preview</h1><div>${svg}${image}${canvas}</div></body></html>`;
     }
 
-    get localResourceRoot(): vscode.Uri {
-        return vscode.Uri.file(path.join(this.context.extensionPath, 'media'));
+    get localResourceRoots(): vscode.Uri[] {
+        return [vscode.Uri.file(path.join(this.context.extensionPath, 'media')),
+        vscode.Uri.file(path.join(this.context.extensionPath, 'node_modules/jquery/dist'))];
     }
 }

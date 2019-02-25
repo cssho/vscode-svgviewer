@@ -154,12 +154,12 @@ export class SvgExportWebviewManager extends WebviewManager {
     }
 
     private registerView(
-        preview: SvgExport
+        view: SvgExport
     ): SvgExport {
-        this.views.push(preview);
+        this.views.push(view);
 
-        preview.onDispose(() => {
-            const existing = this.views.indexOf(preview);
+        view.onDispose(() => {
+            const existing = this.views.indexOf(view);
             if (existing === -1) {
                 return;
             }
@@ -167,7 +167,7 @@ export class SvgExportWebviewManager extends WebviewManager {
             this.views.splice(existing, 1);
         });
 
-        return preview;
+        return view;
     }
 
     private createView(

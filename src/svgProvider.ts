@@ -22,8 +22,8 @@ export abstract class BaseContentProvider {
         }
         return !isSvg;
     }
-    get localResourceRoot(): vscode.Uri {
-        return vscode.Uri.file(path.join(this.context.extensionPath, 'media'));
+    get localResourceRoots(): vscode.Uri[] {
+        return [vscode.Uri.file(path.join(this.context.extensionPath, 'media'))];
     }
     public abstract async provideTextDocumentContent(sourceUri: vscode.Uri, state: any): Promise<string>;
 

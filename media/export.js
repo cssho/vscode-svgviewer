@@ -15,6 +15,14 @@ $(() => {
     $width.keyup(handler($width)).mouseup(handler($width));
     $height.keyup(handler($height)).mouseup(handler($height));
     update();
+    $exprt.on('click', () => vscode.postMessage({
+        command: 'exportData',
+        body: {
+            dataUrl: $canvas[0].toDataURL('image/png'),
+            output: decodeURIComponent($exprt.data('output')),
+            resource: state.resource
+        }
+    }));
 
     function update() {
         let ew = parseInt($width.val(), 10),
@@ -35,14 +43,6 @@ $(() => {
             sw,
             sh
         );
-        vscode.postMessage({
-            command: 'exportData',
-            body: {
-                dataUrl: $canvas[0].toDataURL('image/png'),
-                output: decodeURIComponent($exprt.data('output')),
-                resource: state.resource
-            }
-        })
     }
 
     function handler($elem) {

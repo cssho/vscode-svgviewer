@@ -57,9 +57,3 @@ input:focus {
 .button:focus {
     outline: 0;
 }
-
-.button[href="#"] {
-    background-color: gray;
-    border: 1px solid gray;
-    cursor: not-allowed;
-}

@@ -88,7 +88,7 @@ export class SvgExport extends SvgView {
             SvgExport.viewTitle(resource),
             previewColumn, {
                 enableFindWidget: true,
-                localResourceRoots: [contentProvider.localResourceRoot]
+                localResourceRoots: contentProvider.localResourceRoots
             });
 
         return new SvgExport(
