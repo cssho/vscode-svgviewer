@@ -21,7 +21,7 @@ async function showPreview(
     const resourceColumn = (vscode.window.activeTextEditor && vscode.window.activeTextEditor.viewColumn) || vscode.ViewColumn.One;
     webviewManager.view(resource, {
         resourceColumn: resourceColumn,
-        viewColumn: Configuration.getViewColumn()
+        viewColumn: Configuration.viewColumn()
     });
 }
 
@@ -30,7 +30,15 @@ export class ShowPreviewCommand implements Command {
 
     public constructor(
         private readonly webviewManager: SvgWebviewManager
-    ) { }
+    ) {
+
+        vscode.window.onDidChangeActiveTextEditor(editor => {
+            if (Configuration.enableAutoPreview()
+                && editor && !SvgDocumentContentProvider.checkNoSvg(editor.document, false)) {
+                vscode.commands.executeCommand(this.id, editor.document.uri);
+            }
+        });
+    }
 
     public execute(mainUri?: vscode.Uri, allUris?: vscode.Uri[]) {
         for (const uri of Array.isArray(allUris) ? allUris : [mainUri]) {

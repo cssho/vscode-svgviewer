@@ -23,10 +23,8 @@ function zoomIn() {
     var svgimg = document.getElementById('svgimg');
     var zoomFloat = currentZoomValue(svgimg);
     zoomFloat += zoomFloat * 0.1;
-    svgimg.style.transform = 'scale(' + zoomFloat + ')';
-    state.zoom = zoomFloat;
-    vscode.setState(state);
-    console.log(state.zoom);
+    
+    setZoom(svgimg, zoomFloat);
 }
 
 function zoomOut() {
@@ -34,16 +32,23 @@ function zoomOut() {
     var zoomFloat = currentZoomValue(svgimg);
     zoomFloat -= zoomFloat * 0.1;
     if (zoomFloat < 0.1) return;
+    setZoom(svgimg, zoomFloat);
+};
+
+function setZoom(svgimg, zoomFloat) {
     svgimg.style.transform = 'scale(' + zoomFloat + ')';
     state.zoom = zoomFloat;
     vscode.setState(state);
-};
+    
+    vscode.postMessage({
+        command: 'setState',
+        body: state
+    });
+}
 
 function zoomReset() {
     var svgimg = document.getElementById('svgimg');
-    svgimg.style.transform = 'scale(1.0)';
-    state.zoom = 1.0;
-    vscode.setState(state);
+    setZoom(svgimg, 1.0);
 };
 
 function currentZoomValue(svgimg) {

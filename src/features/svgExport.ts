@@ -40,9 +40,9 @@ export class SvgExport extends SvgView {
     protected constructor(
         webview: vscode.WebviewPanel,
         resource: vscode.Uri,
-        private readonly contentProvider: ExportDocumentContentProvider
+        protected readonly contentProvider: ExportDocumentContentProvider
     ) {
-        super(webview, resource);
+        super(webview, resource, contentProvider);
         this.editor.webview.onDidReceiveMessage((e: ExportDataMessage) => {
             if (e.body.resource !== this._resource.toString()) {
                 return;

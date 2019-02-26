@@ -28,4 +28,9 @@ export class CommandManager {
 
         this.commands.set(id, vscode.commands.registerCommand(id, impl, thisArg));
     }
+
+    public execute(command: string, ...rest: any[]) {
+        console.log(rest);
+        vscode.commands.executeCommand(command, rest);
+    }
 }

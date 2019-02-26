@@ -31,7 +31,6 @@ export function activate(context: vscode.ExtensionContext) {
     commandManager.register(new CopyDataUriCommand());
     context.subscriptions.push(commandManager);
 
-    
     // Check PhantomJS Binary
     if (!fs.existsSync(phantomjs.path)) {
         exec('npm rebuild', { cwd: context.extensionPath });

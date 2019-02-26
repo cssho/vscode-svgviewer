@@ -20,7 +20,7 @@ async function showExport(
     const resourceColumn = (vscode.window.activeTextEditor && vscode.window.activeTextEditor.viewColumn) || vscode.ViewColumn.One;
     webviewManager.view(resource, {
         resourceColumn: resourceColumn,
-        viewColumn: Configuration.getViewColumn()
+        viewColumn: Configuration.viewColumn()
     });
 }
 

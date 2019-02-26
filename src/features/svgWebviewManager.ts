@@ -46,7 +46,7 @@ export class SvgWebviewManager extends WebviewManager {
     ): void {
         let view = this.getExistingView(resource);
         if (view) {
-            view.reveal(viewSettings.viewColumn);
+            view.reveal();
         } else {
             view = this.createView(resource, viewSettings);
         }
@@ -138,7 +138,7 @@ export class SvgExportWebviewManager extends WebviewManager {
     ): void {
         let view = this.getExistingView(resource);
         if (view) {
-            view.reveal(viewSettings.viewColumn);
+            view.reveal();
         } else {
             view = this.createView(resource, viewSettings);
         }

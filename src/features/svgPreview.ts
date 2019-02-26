@@ -3,6 +3,10 @@ import * as path from 'path';
 import { SvgDocumentContentProvider, BaseContentProvider } from '../svgProvider';
 import { isNumber } from 'util';
 
+interface SetStateMessage {
+    readonly command: 'setState';
+    readonly body: any
+}
 export abstract class SvgView {
 
     protected _resource: vscode.Uri;
@@ -13,7 +17,8 @@ export abstract class SvgView {
     private disposed: boolean = false;
     protected disposables: vscode.Disposable[] = [];
     protected constructor(webview: vscode.WebviewPanel,
-        resource: vscode.Uri) {
+        resource: vscode.Uri,
+        protected readonly contentProvider: BaseContentProvider) {
         this._resource = resource;
         this.editor = webview;
 
@@ -24,6 +29,11 @@ export abstract class SvgView {
             if (this.isViewOf(event.document.uri)) {
                 this.refresh();
             }
+        }, null, this.disposables);
+
+        this.editor.onDidChangeViewState(async e => {
+            e.webviewPanel.webview.html
+                = await this.contentProvider.provideTextDocumentContent(resource, this.state);
         }, null, this.disposables);
     }
     public dispose() {
@@ -41,22 +51,17 @@ export abstract class SvgView {
         this.onDisposeEmitter.fire();
         this.onDisposeEmitter.dispose();
 
-        this.onDidChangeViewStateEmitter.dispose();
         this.editor.dispose();
     }
 
     private readonly onDisposeEmitter = new vscode.EventEmitter<void>();
     public readonly onDispose = this.onDisposeEmitter.event;
 
-    private readonly onDidChangeViewStateEmitter = new vscode.EventEmitter<vscode.WebviewPanelOnDidChangeViewStateEvent>();
-    public readonly onDidChangeViewState = this.onDidChangeViewStateEmitter.event;
-
-    
     public get resource(): vscode.Uri {
         return this._resource;
     }
 
-    
+
     public update(resource: vscode.Uri) {
         const isResourceChange = resource.fsPath !== this._resource.fsPath;
         if (isResourceChange) {
@@ -77,7 +82,7 @@ export abstract class SvgView {
         this.firstUpdate = false;
     }
 
-    
+
     public refresh() {
         this.update(this._resource);
     }
@@ -96,8 +101,8 @@ export abstract class SvgView {
         return this.matchesResource(otherView._resource);
     }
 
-    public reveal(viewColumn: vscode.ViewColumn) {
-        this.editor.reveal(viewColumn);
+    public reveal() {
+        this.editor.reveal(this.editor.viewColumn);
     }
 
     private isViewOf(resource: vscode.Uri): boolean {
@@ -123,10 +128,21 @@ export class SvgPreview extends SvgView {
         webview: vscode.WebviewPanel,
         resource: vscode.Uri,
         zoom: number,
-        private readonly contentProvider: SvgDocumentContentProvider
+        protected readonly contentProvider: SvgDocumentContentProvider
     ) {
-        super(webview, resource);
-        this._zoom = zoom
+        super(webview, resource, contentProvider);
+        this._zoom = zoom;
+
+        this.editor.webview.onDidReceiveMessage((e: SetStateMessage) => {
+            if (e.body.resource !== this._resource.toString()) {
+                return;
+            }
+
+            switch (e.command) {
+                case 'setState':
+                    this._zoom = e.body.zoom;
+            }
+        }, null, super.disposables);
     }
 
     public get zoom(): number {

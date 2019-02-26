@@ -18,7 +18,8 @@
         "onCommand:svgviewer.copydui",
         "onCommand:svgviewer.openexport",
         "onWebviewPanel:svg.preview",
-        "onWebviewPanel:svg.export"
+        "onWebviewPanel:svg.export",
+        "*"
     ],
     "main": "./out/src/extension",
     "contributes": {
@@ -119,16 +120,7 @@
                     "type": "string",
                     "enum": [
                         "Active",
-                        "Beside",
-                        "One",
-                        "Two",
-                        "Three",
-                        "Four",
-                        "Five",
-                        "Six",
-                        "Seven",
-                        "Eight",
-                        "Nine"
+                        "Beside"
                     ],
                     "default": "Beside",
                     "description": "How to open the screen (vscode.ViewColumn)"
