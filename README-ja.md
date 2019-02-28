@@ -57,6 +57,6 @@ SVG Viewerでは以下のVisual Studio Codeの設定が可能です。`User Sett
     "svgviewer.transparencycolor": "#2BD163"
 
     // プレビューウィンドウにズームイン・アウトボタンを表示
-    "svgviewer.enableautopreview": true
+    "svgviewer.showzoominout": true
 }
 ```

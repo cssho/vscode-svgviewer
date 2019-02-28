@@ -2,15 +2,14 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
+import { BaseContentProvider } from './svgProvider';
 
-export class ExportDocumentContentProvider implements vscode.TextDocumentContentProvider {
+export class ExportDocumentContentProvider extends BaseContentProvider {
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
 
-    public constructor(private _context: vscode.ExtensionContext) {}
-
-    public provideTextDocumentContent(uri: vscode.Uri): Thenable<string> {
-        let docUri = vscode.Uri.parse(uri.query);
-        return vscode.workspace.openTextDocument(docUri).then(document => this.snippet(document));
+    public async provideTextDocumentContent(uri: vscode.Uri, state: any): Promise<string> {
+        const document = await vscode.workspace.openTextDocument(uri);
+        return this.snippet(document, state);
     }
 
     get onDidChange(): vscode.Event<vscode.Uri> {
@@ -21,11 +20,7 @@ export class ExportDocumentContentProvider implements vscode.TextDocumentContent
         this._onDidChange.fire(uri);
     }
 
-    private getPath(p: string): string {
-        return path.join(this._context.extensionPath, p);
-    }
-
-    private snippet(document: vscode.TextDocument): string {
+    private snippet(document: vscode.TextDocument, state: any): string {
         let showTransGrid = vscode.workspace.getConfiguration('svgviewer').get('transparencygrid');
         let css = `<link rel="stylesheet" type="text/css" href="${this.getPath('media/export.css')}">`;
         let jquery = `<script src="${this.getPath('node_modules/jquery/dist/jquery.js')}"></script>`;
@@ -38,6 +33,12 @@ export class ExportDocumentContentProvider implements vscode.TextDocumentContent
         let width = `<div class="wrapper"><label for="width" class="label-name">Width</label><input id="width" type="number" placeholder="width"><label for="width"> px</label></div>`;
         let height = `<div class="wrapper"><label for="height" class="label-name">Height</label><input id="height" type="number" placeholder="height"><label for="height"> px</label></div>`;
         let options = `<h1>Options</h1><div class="form">${width}${height}${exportButton}</div>`;
-        return `<!DOCTYPE html><html><head>${css}${jquery}${exportjs}</head><body>${options}<h1>Preview</h1><div>${svg}${image}${canvas}</div></body></html>`;
+        let stateMeta = `<meta id="vscode-svg-preview-data" data-state="${JSON.stringify(state || {}).replace(/"/g, '&quot;')}">`
+        return `<!DOCTYPE html><html><head>${stateMeta}${css}${jquery}${exportjs}</head><body>${options}<h1>Preview</h1><div>${svg}${image}${canvas}</div></body></html>`;
+    }
+
+    get localResourceRoots(): vscode.Uri[] {
+        return [vscode.Uri.file(path.join(this.context.extensionPath, 'media')),
+        vscode.Uri.file(path.join(this.context.extensionPath, 'node_modules/jquery/dist'))];
     }
 }
