@@ -59,6 +59,12 @@ export class SvgWebviewManager extends WebviewManager {
         webview: vscode.WebviewPanel,
         state: any
     ): Promise<void> {
+        const duplicate = this.getExistingView(vscode.Uri.parse(state.resource));
+
+        if (duplicate) {
+            webview.dispose();
+            duplicate.update(vscode.Uri.parse(state.resource));
+        }
         const preview = await SvgPreview.revive(
             webview,
             state,
