@@ -51,7 +51,7 @@ SVG Viewerでは以下のVisual Studio Codeの設定が可能です。`User Sett
     "svgviewer.enableautopreview": true,
 
     // プレビューの開き方を指定 (vscode.ViewColumn)
-    "svgviewer.previewcolumn": "One",
+    "svgviewer.previewcolumn": "Beside",
 
     // 透過色
     "svgviewer.transparencycolor": "#2BD163"
