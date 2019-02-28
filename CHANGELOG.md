@@ -1,4 +1,7 @@
 # Changelog
+## 2.0.0 (2019-02-28)
+- [Upgrade to VS Code's webview API](https://github.com/cssho/vscode-svgviewer/issues/51)
+
 ## 1.4.7 (2018-10-10)
 - [Buttons for zooming](https://github.com/cssho/vscode-svgviewer/issues/48)
 

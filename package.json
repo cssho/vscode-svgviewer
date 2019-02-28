@@ -2,7 +2,7 @@
     "name": "vscode-svgviewer",
     "displayName": "SVG Viewer",
     "description": "SVG Viewer for Visual Studio Code.",
-    "version": "1.4.7",
+    "version": "2.0.0",
     "publisher": "cssho",
     "engines": {
         "vscode": "^1.30.0"
