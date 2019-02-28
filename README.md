@@ -52,7 +52,7 @@ The following Visual Studio Code setting is available for the SVG Viewer.  This 
     "svgviewer.enableautopreview": true,
 
     // How to open the screen (vscode.ViewColumn)
-    "svgviewer.previewcolumn": Two,
+    "svgviewer.previewcolumn": "Beside",
     
     // Color setting for transparency
     "svgviewer.transparencycolor": "#2BD163",
