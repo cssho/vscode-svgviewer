@@ -5,7 +5,7 @@ import { SvgDocumentContentProvider } from './svgProvider';
 import { CommandManager } from './commandManager';
 import { ShowPreviewCommand } from './commands/showPreview'
 
-import exec = require('sync-exec');
+import exec = require('child_process');
 import fs = require('pn/fs');
 import path = require('path');
 import phantomjs = require('phantomjs-prebuilt');
@@ -33,7 +33,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Check PhantomJS Binary
     if (!fs.existsSync(phantomjs.path)) {
-        exec('npm rebuild', { cwd: context.extensionPath });
+        exec.execSync('npm rebuild', { cwd: context.extensionPath });
         process.env.PHANTOMJS_PLATFORM = process.platform;
         process.env.PHANTOMJS_ARCH = process.arch;
         phantomjs.path = process.platform === 'win32' ?

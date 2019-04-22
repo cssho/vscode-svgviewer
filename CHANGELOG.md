@@ -1,4 +1,7 @@
 # Changelog
+## 2.0.1 (2019-04-22)
+- [Broken preview for SVG files missing XML namespace](https://github.com/cssho/vscode-svgviewer/issues/55)
+
 ## 2.0.0 (2019-02-28)
 - [Upgrade to VS Code's webview API](https://github.com/cssho/vscode-svgviewer/issues/51)
 
