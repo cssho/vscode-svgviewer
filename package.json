@@ -2,7 +2,7 @@
     "name": "vscode-svgviewer",
     "displayName": "SVG Viewer",
     "description": "SVG Viewer for Visual Studio Code.",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "publisher": "cssho",
     "engines": {
         "vscode": "^1.30.0"
@@ -23,7 +23,8 @@
     ],
     "main": "./out/src/extension",
     "contributes": {
-        "commands": [{
+        "commands": [
+            {
                 "command": "svgviewer.open",
                 "title": "SVG Viewer: View SVG",
                 "icon": {
@@ -49,12 +50,15 @@
             }
         ],
         "menus": {
-            "editor/title": [{
-                "when": "editorLangId == xml",
-                "command": "svgviewer.open",
-                "group": "navigation"
-            }],
-            "explorer/context": [{
+            "editor/title": [
+                {
+                    "when": "editorLangId == xml",
+                    "command": "svgviewer.open",
+                    "group": "navigation"
+                }
+            ],
+            "explorer/context": [
+                {
                     "command": "svgviewer.open",
                     "group": "extension",
                     "when": "resourceLangId  == xml"
@@ -76,7 +80,8 @@
                 }
             ]
         },
-        "keybindings": [{
+        "keybindings": [
+            {
                 "command": "svgviewer.open",
                 "key": "alt+shift+s o"
             },
@@ -129,6 +134,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Show zoom in/out button in preview windows"
+                },
+                "svgviewer.autoInsertNamespace": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "If SVG namespace doesn't exist in a file, it will be added automatically"
                 }
             }
         }
@@ -152,7 +162,6 @@
         "phantomjs-prebuilt": "^2.1.16",
         "pn": "^1.1.0",
         "svgexport": "^0.3.2",
-        "sync-exec": "^0.6.2",
         "tmp": "^0.0.33"
     },
     "repository": {

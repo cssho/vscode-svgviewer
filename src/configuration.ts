@@ -11,7 +11,7 @@ export class Configuration {
     }
 
     public static showTransGrid(): boolean {
-        return vscode.workspace.getConfiguration('svgviewer').get('transparencygrid');
+        return vscode.workspace.getConfiguration('svgviewer').get<boolean>('transparencygrid');
     }
 
     public static transparencyColor(): string {
@@ -19,6 +19,10 @@ export class Configuration {
     }
 
     public static enableAutoPreview(): boolean {
-        return vscode.workspace.getConfiguration('svgviewer').get('enableautopreview');
+        return vscode.workspace.getConfiguration('svgviewer').get<boolean>('enableautopreview');
+    }
+
+    public static enableAutoInsertNamespace(): boolean {
+        return vscode.workspace.getConfiguration('svgviewer').get<boolean>('autoInsertNamespace');
     }
 }

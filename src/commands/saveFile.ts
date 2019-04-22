@@ -10,9 +10,9 @@ async function saveFileAs(uri: vscode.Uri) {
     let resource = uri;
     const textDocument = await loadTextDocument(resource);
     if (SvgDocumentContentProvider.checkNoSvg(textDocument)) return;
-    const text = textDocument.getText();
+    const text = SvgDocumentContentProvider.addNamespace(textDocument.getText());
     const tmpobj = tmp.fileSync({ 'postfix': '.svg' });
-    const pngpath = resource.fsPath.replace('.svg', '.png');
+    const pngpath = textDocument.fileName.replace('.svg', '.png');
     exportPng(tmpobj, text, pngpath);
 }
 
@@ -20,9 +20,9 @@ async function saveFileAsSize(uri: vscode.Uri) {
     let resource = uri;
     const textDocument = await loadTextDocument(resource);
     if (SvgDocumentContentProvider.checkNoSvg(textDocument)) return;
-    const text = textDocument.getText();
+    const text = SvgDocumentContentProvider.addNamespace(textDocument.getText());
     const tmpobj = tmp.fileSync({ 'postfix': '.svg' });
-    const pngpath = resource.fsPath.replace('.svg', '.png');
+    const pngpath = textDocument.fileName.replace('.svg', '.png');
     creatInputBox('width')
         .then(width => {
             if (width) {

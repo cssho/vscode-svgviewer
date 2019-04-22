@@ -9,7 +9,7 @@ import { Configuration } from './configuration';
 export abstract class BaseContentProvider {
 
     public constructor(protected context: vscode.ExtensionContext) { }
-    private static readonly svgRegexp = /<svg .*<\/svg>/s;
+    private static readonly svgRegexp = /<svg.*<\/svg>/s;
     private static readonly noSvgErrorNessage = `Active editor doesn't show a SVG document - no properties to preview.`;
     public static checkNoSvg(document: vscode.TextDocument, displayMessage: boolean = true) {
         if (!document) {
@@ -60,6 +60,7 @@ export class SvgDocumentContentProvider extends BaseContentProvider {
         while (matches = SvgDocumentContentProvider.stylesheetRegex.exec(properties)) {
             css.push(matches[1]);
         }
+        properties = SvgDocumentContentProvider.addNamespace(properties);
         let html = `<!DOCTYPE html><html><head>
 <meta id="vscode-svg-preview-data" data-state="${JSON.stringify(state || {}).replace(/"/g, '&quot;')}">
 ${transparencyGridCss}
@@ -71,6 +72,14 @@ ${transparencyGridCss}
         </body></html>`;
         return html;
     }
+    public static addNamespace(properties: string) {
+        if (Configuration.enableAutoInsertNamespace()
+            && properties.indexOf('xmlns="http://www.w3.org/2000/svg"') < 0) {
+            properties = properties.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+        }
+        return properties;
+    }
+
     public async provideTextDocumentContent(sourceUri: vscode.Uri, state: any): Promise<string> {
         const document = await vscode.workspace.openTextDocument(sourceUri);
         this.resourceDir = path.dirname(sourceUri.fsPath);
