@@ -3,7 +3,7 @@ import { Command } from '../commandManager';
 import tmp = require('tmp');
 import svgexport = require('svgexport');
 import fs = require('pn/fs');
-import cp = require('copy-paste');
+import cp = require('clipboardy');
 import { SvgDocumentContentProvider } from '../svgProvider';
 
 async function saveFileAs(uri: vscode.Uri) {
@@ -50,8 +50,8 @@ async function copyDataUri(uri: vscode.Uri) {
     let resource = uri;
     const textDocument = await loadTextDocument(resource);
     if (SvgDocumentContentProvider.checkNoSvg(textDocument)) return;
-    const text = textDocument.getText();
-    cp.copy('data:image/svg+xml,' + encodeURIComponent(text));
+    const text = SvgDocumentContentProvider.addNamespace(textDocument.getText());
+    cp.writeSync('data:image/svg+xml,' + encodeURIComponent(text));
 }
 
 export class SaveAsCommand implements Command {
